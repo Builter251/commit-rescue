@@ -5,12 +5,12 @@
 (function () {
   'use strict';
 
-  var toast = window.CRUtil.toast;
-  var copyText = window.CRUtil.copyText;
+  const toast = window.CRUtil.toast;
+  const copyText = window.CRUtil.copyText;
 
   /* ------------------------------ 햄버거 메뉴 ------------------------------ */
-  var toggle = document.getElementById('navToggle');
-  var menu = document.getElementById('navMenu');
+  const toggle = document.getElementById('navToggle');
+  const menu = document.getElementById('navMenu');
 
   function closeMenu() {
     if (!menu) return;
@@ -54,28 +54,28 @@
   }
 
   /* --------------------------- 스크롤 활성 표시 --------------------------- */
-  var links = Array.prototype.slice.call(document.querySelectorAll('.nav__link'));
-  var sections = links
+  const links = Array.prototype.slice.call(document.querySelectorAll('.nav__link'));
+  const sections = links
     .map(function (a) { return document.querySelector(a.getAttribute('href')); })
     .filter(Boolean);
 
   function setActive(id) {
     links.forEach(function (a) {
-      var on = a.getAttribute('href') === '#' + id;
+      const on = a.getAttribute('href') === '#' + id;
       a.classList.toggle('is-active', on);
       if (on) { a.setAttribute('aria-current', 'true'); } else { a.removeAttribute('aria-current'); }
     });
   }
 
   if ('IntersectionObserver' in window && sections.length) {
-    var visible = {};
-    var observer = new IntersectionObserver(function (entries) {
+    const visible = {};
+    const observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         visible[entry.target.id] = entry.isIntersecting ? entry.intersectionRatio : 0;
       });
-      var best = null, bestRatio = 0;
+      let best = null, bestRatio = 0;
       sections.forEach(function (s) {
-        var r = visible[s.id] || 0;
+        const r = visible[s.id] || 0;
         if (r > bestRatio) { bestRatio = r; best = s.id; }
       });
       if (best) setActive(best);
@@ -85,11 +85,11 @@
   }
 
   /* ------------------------------- 테마 토글 ------------------------------- */
-  var themeBtn = document.getElementById('themeToggle');
+  const themeBtn = document.getElementById('themeToggle');
 
   function paintThemeButton(theme) {
     if (!themeBtn) return;
-    var isDark = theme === 'dark';
+    const isDark = theme === 'dark';
     themeBtn.querySelector('.theme-toggle__icon').textContent = isDark ? '☀️' : '🌙';
     themeBtn.querySelector('.theme-toggle__text').textContent = isDark ? '라이트 모드' : '다크 모드';
     themeBtn.setAttribute('aria-pressed', String(isDark));
@@ -100,7 +100,7 @@
 
   if (themeBtn) {
     themeBtn.addEventListener('click', function () {
-      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('cr-theme', next); } catch (e) { /* noop */ }
       paintThemeButton(next);
@@ -110,17 +110,17 @@
   /* ------------------------------- 복사 버튼 ------------------------------- */
   // 결과 영역은 동적으로 그려지므로 문서 단위 위임으로 처리한다
   document.addEventListener('click', function (e) {
-    var btn = e.target.closest('.copy-btn');
+    const btn = e.target.closest('.copy-btn');
     if (!btn || btn.disabled) return;
 
-    var text = btn.dataset.copy;
+    let text = btn.dataset.copy;
     if (!text) {
-      var pre = btn.parentElement.querySelector('pre');
+      const pre = btn.parentElement.querySelector('pre');
       text = pre ? pre.textContent : '';
     }
     copyText(text).then(function () {
       toast('복사했습니다');
-      var old = btn.textContent;
+      const old = btn.textContent;
       btn.textContent = '복사됨';
       setTimeout(function () { btn.textContent = old; }, 1400);
     }).catch(function () {

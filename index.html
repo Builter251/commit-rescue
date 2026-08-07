@@ -8,11 +8,13 @@
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
 <script>
-  // 첫 페인트 전에 테마를 확정한다 (기획서 8.3절)
+  // 여기만 의도적으로 인라인 + 블로킹이다.
+  // defer는 인라인 스크립트에 적용되지 않고, 이 코드는 첫 페인트 전에 실행돼야
+  // 다크 모드에서 흰 화면이 번쩍이지 않는다 (기획서 8.3절).
   (function () {
     try {
-      var saved = localStorage.getItem('cr-theme');
-      var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const saved = localStorage.getItem('cr-theme');
+      const theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {
       document.documentElement.setAttribute('data-theme', 'light');
@@ -21,6 +23,17 @@
 </script>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/responsive.css">
+
+<!-- defer: HTML 파싱과 병렬로 내려받고, 파싱이 끝난 뒤 아래 순서 그대로 실행한다.
+     각 파일이 로드 시점에 DOM을 조회하고(areas.js, presets.js),
+     graph.js가 정의한 window.CRUtil을 areas.js가 즉시 소비하므로
+     "DOM 준비 후 + 순서 보장"이 둘 다 필요하다. async는 순서를 깨서 쓸 수 없다. -->
+<script defer src="js/graph-templates.js"></script>
+<script defer src="js/graph.js"></script>
+<script defer src="js/areas.js"></script>
+<script defer src="js/presets.js"></script>
+<script defer src="js/rescue.js"></script>
+<script defer src="js/main.js"></script>
 </head>
 <body>
 
@@ -673,12 +686,5 @@ git log --oneline main..origin/main   # 원격에는 있고 내게 없는 커밋
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-
-<script src="js/graph-templates.js"></script>
-<script src="js/graph.js"></script>
-<script src="js/areas.js"></script>
-<script src="js/presets.js"></script>
-<script src="js/rescue.js"></script>
-<script src="js/main.js"></script>
 </body>
 </html>

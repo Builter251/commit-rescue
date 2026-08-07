@@ -5,20 +5,20 @@
 (function () {
   'use strict';
 
-  var esc = window.CRUtil.escapeHtml;
+  const esc = window.CRUtil.escapeHtml;
 
   /* 5영역 정의 — AI 응답의 변경영역/유지영역 키와 1:1로 대응한다 */
-  var AREA_META = {
+  const AREA_META = {
     'work':            { no: '1.', name: '작업 폴더',      where: '내 컴퓨터' },
     'staging':         { no: '2.', name: '스테이징 영역',   where: '내 컴퓨터' },
     'local':           { no: '3.', name: '로컬 main',       where: '내 컴퓨터' },
     'origin-tracking': { no: '4.', name: 'origin/main',     where: '내 컴퓨터 (기록)' },
     'remote':          { no: '5.', name: 'GitHub main',     where: 'GitHub' }
   };
-  var AREA_ORDER = ['work', 'staging', 'local', 'origin-tracking', 'remote'];
+  const AREA_ORDER = ['work', 'staging', 'local', 'origin-tracking', 'remote'];
 
   /* 명령어 → 강조할 화살표와 영역 */
-  var FLOWS = {
+  const FLOWS = {
     'add': {
       arrows: ['arrow-add'], areas: ['area-work', 'area-staging'],
       desc: 'git add — 작업 폴더에서 고른 파일을 스테이징에 올립니다. 커밋 기록은 아직 만들어지지 않습니다.'
@@ -62,9 +62,9 @@
     'none': { arrows: [], areas: [], desc: '' }
   };
 
-  var svg = document.getElementById('areaDiagram');
-  var descEl = document.getElementById('flowDesc');
-  var DEFAULT_DESC = descEl ? descEl.textContent : '';
+  const svg = document.getElementById('areaDiagram');
+  const descEl = document.getElementById('flowDesc');
+  const DEFAULT_DESC = descEl ? descEl.textContent : '';
 
   function clearHighlight() {
     if (!svg) return;
@@ -81,14 +81,14 @@
   function highlightFlow(flowId) {
     if (!svg) return;
     clearHighlight();
-    var flow = FLOWS[flowId];
+    const flow = FLOWS[flowId];
     if (!flow || flowId === 'none') {
       if (descEl) descEl.textContent = DEFAULT_DESC;
       return;
     }
     svg.classList.add('is-focused');
     flow.arrows.concat(flow.areas).forEach(function (id) {
-      var el = svg.querySelector('#' + id);
+      const el = svg.querySelector('#' + id);
       if (el) el.classList.add('is-on');
     });
     if (descEl) descEl.textContent = flow.desc;
@@ -104,12 +104,12 @@
     changed = Array.isArray(changed) ? changed : [];
     kept = Array.isArray(kept) ? kept : [];
 
-    var rows = AREA_ORDER.map(function (key) {
-      var meta = AREA_META[key];
-      var state = changed.indexOf(key) !== -1 ? 'changed'
+    const rows = AREA_ORDER.map(function (key) {
+      const meta = AREA_META[key];
+      const state = changed.indexOf(key) !== -1 ? 'changed'
                 : kept.indexOf(key) !== -1 ? 'kept' : 'none';
-      var mark = state === 'changed' ? '▲' : state === 'kept' ? '=' : '·';
-      var note = state === 'changed' ? '이 명령으로 바뀝니다'
+      const mark = state === 'changed' ? '▲' : state === 'kept' ? '=' : '·';
+      const note = state === 'changed' ? '이 명령으로 바뀝니다'
                : state === 'kept' ? '그대로 유지됩니다' : '해당 없음';
       return '<li class="mini-area is-' + state + '">' +
         '<span class="mini-area__mark" aria-hidden="true">' + mark + '</span>' +
@@ -124,7 +124,7 @@
 
   /** 영역 키 배열을 사람이 읽는 이름 칩으로 */
   function renderAreaChips(changed, kept) {
-    var out = '';
+    let out = '';
     (changed || []).forEach(function (key) {
       if (!AREA_META[key]) return;
       out += '<span class="chip chip--change">' + esc(AREA_META[key].name) + ' 변경</span>';
@@ -142,8 +142,8 @@
   // 개념 섹션의 명령어 버튼
   document.querySelectorAll('.flow-buttons .pill').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var flowId = btn.dataset.flow;
-      var isActive = btn.classList.contains('is-active');
+      const flowId = btn.dataset.flow;
+      const isActive = btn.classList.contains('is-active');
       document.querySelectorAll('.flow-buttons .pill').forEach(function (b) { b.classList.remove('is-active'); });
       document.querySelectorAll('.cmd').forEach(function (c) { c.classList.remove('is-active'); });
 
@@ -156,35 +156,46 @@
     });
   });
 
-  // 명령어 사전 카드 → 위쪽 다이어그램 강조 (V3)
+  /* 명령어 사전 카드 → 위쪽 다이어그램 강조 (V3)
+
+     예전에는 카드 자체에 role="button" + tabindex 를 붙였는데 두 가지가 잘못이었다.
+       1) 카드 안에 이미 <button>(복사)이 들어 있어 버튼 안에 버튼이 중첩됐다. ARIA 위반이다.
+       2) role="button" 의 접근가능한 이름이 카드 본문 전체(90자 넘는 문장)가 되어
+          스크린리더가 버튼 하나를 읽는 데 문단 하나를 통째로 읽었다.
+     그래서 카드는 평범한 컨테이너로 되돌리고, 전용 버튼을 하나 넣는다.
+     마우스 사용자의 "카드 아무 데나 클릭"은 보조 수단으로 남긴다. */
   document.querySelectorAll('.cmd').forEach(function (card) {
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('role', 'button');
-    var activate = function () {
-      var flowId = card.dataset.flow || 'none';
-      var wasActive = card.classList.contains('is-active');
+    const flowId = card.dataset.flow || 'none';
+
+    const activate = function () {
+      const wasActive = card.classList.contains('is-active');
       document.querySelectorAll('.cmd').forEach(function (c) { c.classList.remove('is-active'); });
       document.querySelectorAll('.flow-buttons .pill').forEach(function (b) { b.classList.remove('is-active'); });
 
       if (wasActive) { highlightFlow('none'); return; }
       card.classList.add('is-active');
       highlightFlow(flowId);
-      if (flowId !== 'none') {
-        var target = document.getElementById('basics');
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      const target = document.getElementById('basics');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
+
+    // 강조할 영역이 없는 명령(git status, git worktree)은 버튼을 만들지 않는다
+    if (flowId === 'none') return;
+
+    const title = card.querySelector('h3');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cmd__focus';
+    btn.textContent = '영향 영역 보기';
+    btn.setAttribute('aria-label',
+      (title ? title.textContent.trim() + ' — ' : '') + '영향 영역을 5영역 다이어그램에서 보기');
+    btn.addEventListener('click', activate);
+    card.appendChild(btn);
+
+    // 마우스 편의용. 카드 안의 버튼·링크 클릭은 그대로 통과시킨다.
     card.addEventListener('click', function (e) {
-      // 카드 안의 복사 버튼이나 링크를 누른 경우는 통과시킨다
       if (e.target.closest('button, a')) return;
       activate();
-    });
-    card.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        if (e.target.closest('button, a')) return;
-        e.preventDefault();
-        activate();
-      }
     });
   });
 

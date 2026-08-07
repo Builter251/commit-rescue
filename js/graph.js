@@ -15,7 +15,7 @@
   'use strict';
 
   /* ------------------------------- 공용 유틸 ------------------------------- */
-  var util = {
+  const util = {
     escapeHtml: function (value) {
       return String(value == null ? '' : value)
         .replace(/&/g, '&amp;')
@@ -25,12 +25,26 @@
         .replace(/'/g, '&#39;');
     },
     toast: function (message) {
-      var el = document.getElementById('toast');
+      const el = document.getElementById('toast');
       if (!el) return;
       el.textContent = message;
       el.hidden = false;
       clearTimeout(el._timer);
       el._timer = setTimeout(function () { el.hidden = true; }, 2000);
+    },
+    /* 위험도 배지 — presets.js 와 rescue.js 가 각자 같은 표를 들고 있었다.
+       한쪽만 고치면 조용히 어긋나므로 여기 한 곳에만 둔다.
+       색 외에 아이콘과 텍스트로도 구분한다 (기획서 8.2절). */
+    RISK_CLASS: { '안전': 'safe', '주의': 'warn', '위험': 'danger' },
+    RISK_ICON: { '안전': '✓', '주의': '!', '위험': '⚠' },
+    riskBadge: function (level, options) {
+      const opts = options || {};
+      const cls = util.RISK_CLASS[level] || 'warn';
+      const icon = util.RISK_ICON[level] || '!';
+      return '<span class="risk risk--' + cls + '">' +
+             '<span aria-hidden="true">' + icon + '</span> ' +
+             (opts.prefix ? '위험도 ' : '') + util.escapeHtml(level) +
+             '</span>';
     },
     copyText: function (text) {
       if (navigator.clipboard && window.isSecureContext) {
@@ -38,7 +52,7 @@
       }
       // 구형 브라우저 / http 환경 대비
       return new Promise(function (resolve, reject) {
-        var ta = document.createElement('textarea');
+        const ta = document.createElement('textarea');
         ta.value = text;
         ta.setAttribute('readonly', '');
         ta.style.position = 'fixed';
@@ -58,7 +72,7 @@
   window.CRUtil = util;
 
   /* ------------------------------- 렌더링 ------------------------------- */
-  var R = 13, GAP = 110, X0 = 40, Y0 = 60, ROW_GAP = 70;
+  const R = 13, GAP = 110, X0 = 40, Y0 = 60, ROW_GAP = 70;
 
   function cx(commit) { return X0 + commit.col * GAP; }
   function cy(commit) { return Y0 + (commit.row || 0) * ROW_GAP; }
@@ -69,19 +83,19 @@
    * @returns {string} SVG 마크업
    */
   function buildStageSvg(stage) {
-    var commits = stage.commits || [];
+    const commits = stage.commits || [];
     if (!commits.length) return '';
 
-    var byId = {};
+    const byId = {};
     commits.forEach(function (c) { byId[c.id] = c; });
 
-    var refsByCommit = {};
+    const refsByCommit = {};
     (stage.refs || []).forEach(function (ref) {
       (refsByCommit[ref.on] = refsByCommit[ref.on] || []).push(ref);
     });
 
-    var parts = [];
-    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    const parts = [];
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     function track(x, y) {
       if (x < minX) minX = x;
       if (x > maxX) maxX = x;
@@ -91,12 +105,12 @@
 
     /* 1) 부모 연결선 — 원 뒤에 깔리도록 먼저 그린다 */
     commits.forEach(function (c) {
-      var parents = c.parents || (c.parent ? [c.parent] : []);
+      const parents = c.parents || (c.parent ? [c.parent] : []);
       parents.forEach(function (pid) {
-        var p = byId[pid];
+        const p = byId[pid];
         if (!p) return;
-        var px = cx(p), py = cy(p), qx = cx(c), qy = cy(c);
-        var d;
+        const px = cx(p), py = cy(p), qx = cx(c), qy = cy(c);
+        let d;
         if (py === qy) {
           d = 'M' + (px + R) + ',' + py + ' L' + (qx - R) + ',' + qy;
         } else {
@@ -110,7 +124,7 @@
 
     /* 2) 커밋 원 + 해시 + 메모 + 라벨 알약 */
     commits.forEach(function (c) {
-      var x = cx(c), y = cy(c), isRow1 = (c.row || 0) === 1;
+      const x = cx(c), y = cy(c), isRow1 = (c.row || 0) === 1;
       track(x - R, y - R); track(x + R, y + R);
 
       parts.push(
@@ -121,12 +135,12 @@
         (c.hi ? ' fill="#fff"' : '') + '>' + util.escapeHtml(c.id.slice(0, 3)) + '</text>'
       );
 
-      var refs = refsByCommit[c.id] || [];
+      const refs = refsByCommit[c.id] || [];
       refs.forEach(function (ref, i) {
         // row 0 은 위로, row 1 은 아래로 쌓는다 (두 줄이 서로 겹치지 않게)
-        var centerY = isRow1 ? (y + 34 + i * 24) : (y - 34 - i * 24);
-        var w = ref.name.length * 8 + 20;
-        var boxX = x - w / 2, boxY = centerY - 10;
+        const centerY = isRow1 ? (y + 34 + i * 24) : (y - 34 - i * 24);
+        const w = ref.name.length * 8 + 20;
+        const boxX = x - w / 2, boxY = centerY - 10;
         parts.push(
           '<rect class="cg-ref-box' + (ref.dashed ? ' is-dashed' : '') + '" x="' + boxX + '" y="' + boxY +
           '" width="' + w + '" height="20" rx="10"></rect>'
@@ -139,23 +153,23 @@
       });
 
       if (c.note) {
-        var noteY = isRow1
+        const noteY = isRow1
           ? y + 34 + (refs.length ? refs.length * 24 + 4 : 0)
           : y + 34;
         parts.push(
           '<text class="cg-note" x="' + x + '" y="' + noteY + '" text-anchor="middle">' +
           util.escapeHtml(c.note) + '</text>'
         );
-        var noteHalf = Math.max(40, c.note.length * 6);
+        const noteHalf = Math.max(40, c.note.length * 6);
         track(x - noteHalf, noteY - 11); track(x + noteHalf, noteY + 4);
       }
     });
 
-    var pad = 8;
-    var vbX = Math.floor(minX - pad);
-    var vbY = Math.floor(minY - pad);
-    var vbW = Math.ceil(maxX - minX + pad * 2);
-    var vbH = Math.ceil(maxY - minY + pad * 2);
+    const pad = 8;
+    const vbX = Math.floor(minX - pad);
+    const vbY = Math.floor(minY - pad);
+    const vbW = Math.ceil(maxX - minX + pad * 2);
+    const vbH = Math.ceil(maxY - minY + pad * 2);
 
     return '<svg class="commit-graph" viewBox="' + vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH + '" ' +
            'width="' + vbW + '" height="' + vbH + '" role="img" aria-label="' +
@@ -169,11 +183,11 @@
    * @returns {string} HTML. 템플릿이 없거나 'none'이면 빈 문자열
    */
   function renderGraphTemplate(templateId) {
-    var tpl = window.GRAPH_TEMPLATES[templateId];
+    const tpl = window.GRAPH_TEMPLATES[templateId];
     if (!templateId || templateId === 'none' || !tpl) return '';
 
-    var stages = [tpl.before, tpl.after].filter(Boolean);
-    var html = '<div class="graph-box">' +
+    const stages = [tpl.before, tpl.after].filter(Boolean);
+    let html = '<div class="graph-box">' +
       '<p class="graph-notice"><span aria-hidden="true">ℹ️</span>' +
       '<span>이 그림은 <strong>개념 예시</strong>입니다. 현재 저장소의 실제 그래프가 아닙니다.</span></p>';
 

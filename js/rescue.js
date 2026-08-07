@@ -5,26 +5,24 @@
 (function () {
   'use strict';
 
-  var esc = window.CRUtil.escapeHtml;
-  var toast = window.CRUtil.toast;
+  const esc = window.CRUtil.escapeHtml;
+  const toast = window.CRUtil.toast;
 
-  var form = document.getElementById('rescueForm');
-  var situationEl = document.getElementById('situation');
-  var countEl = document.getElementById('situationCount');
-  var errorEl = document.getElementById('formError');
-  var submitBtn = document.getElementById('submitBtn');
-  var resetBtn = document.getElementById('resetBtn');
-  var region = document.getElementById('resultRegion');
+  const form = document.getElementById('rescueForm');
+  const situationEl = document.getElementById('situation');
+  const countEl = document.getElementById('situationCount');
+  const errorEl = document.getElementById('formError');
+  const submitBtn = document.getElementById('submitBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const region = document.getElementById('resultRegion');
 
-  var MAX_SITUATION = 1000;
-  var MIN_SITUATION = 5;
-  var TIMEOUT_MS = 20000;
-  var SLOW_MS = 5000;
-  var COOLDOWN_MS = 10000;
+  const MAX_SITUATION = 1000;
+  const MIN_SITUATION = 5;
+  const TIMEOUT_MS = 20000;
+  const SLOW_MS = 5000;
+  const COOLDOWN_MS = 10000;
 
-  var RISK_CLASS = { '안전': 'safe', '주의': 'warn', '위험': 'danger' };
-  var RISK_ICON = { '안전': '✓', '주의': '!', '위험': '⚠' };
-  var WHERE_LABEL = {
+  const WHERE_LABEL = {
     'local': '내 컴퓨터 안의 문제',
     '저장소관계': '로컬과 원격의 관계 문제',
     '네트워크인증': '연결 · 인증 문제',
@@ -33,10 +31,10 @@
   };
 
   /* 서버가 최종 검증하지만, 프론트도 한 번 더 확인한다 */
-  var ALLOWED_TEMPLATES = window.GRAPH_TEMPLATE_IDS || ['none'];
+  const ALLOWED_TEMPLATES = window.GRAPH_TEMPLATE_IDS || ['none'];
 
   /* 확실한 토큰 형태 — 발견 시 전송을 막는다 */
-  var HARD_SECRET_PATTERNS = [
+  const HARD_SECRET_PATTERNS = [
     { re: /gh[pousr]_[A-Za-z0-9]{16,}/, name: 'GitHub 액세스 토큰' },
     { re: /\bsk-[A-Za-z0-9_\-]{16,}/, name: 'API 시크릿 키' },
     { re: /AIza[0-9A-Za-z_\-]{20,}/, name: 'Google API 키' },
@@ -45,28 +43,22 @@
     { re: /https?:\/\/[^\s:@]+:[^\s@]+@/, name: '비밀번호가 포함된 저장소 주소' }
   ];
   /* 40자 이상 16진 문자열 — 커밋 해시일 수도 있으므로 경고 후 사용자가 넘길 수 있게 한다 */
-  var SOFT_SECRET_PATTERN = /\b[0-9a-f]{40,}\b/;
+  const SOFT_SECRET_PATTERN = /\b[0-9a-f]{40,}\b/;
 
   /* ====================================================================== */
   /*  결과 렌더링                                                            */
   /* ====================================================================== */
 
-  function riskBadge(level) {
-    var cls = RISK_CLASS[level] || 'warn';
-    var icon = RISK_ICON[level] || '!';
-    return '<span class="risk risk--' + cls + '"><span aria-hidden="true">' + icon + '</span> 위험도 ' + esc(level) + '</span>';
-  }
-
   function evidenceBlock(evidence) {
     evidence = evidence || {};
-    var groups = [
+    const groups = [
       { key: '확인됨', cls: 'confirmed', icon: '✓', title: '확인됨', hint: '입력하신 내용에서 확인된 사실입니다.' },
       { key: '추정', cls: 'guess', icon: '?', title: '추정', hint: '입력에 없어 미루어 짐작한 부분입니다. 다를 수 있습니다.' },
       { key: '추가확인', cls: 'todo', icon: '→', title: '추가로 확인하면 좋은 것', hint: '' }
     ];
 
-    var html = groups.map(function (g) {
-      var items = Array.isArray(evidence[g.key]) ? evidence[g.key].filter(Boolean) : [];
+    const html = groups.map(function (g) {
+      const items = Array.isArray(evidence[g.key]) ? evidence[g.key].filter(Boolean) : [];
       if (!items.length) return '';
       return '<div class="evidence__group evidence--' + g.cls + '">' +
         '<h4><span aria-hidden="true">' + g.icon + '</span> ' + g.title + '</h4>' +
@@ -82,8 +74,8 @@
   }
 
   function stepsBlock(commands, locked) {
-    var html = commands.map(function (step) {
-      var cmd = String(step.cmd || '');
+    const html = commands.map(function (step) {
+      const cmd = String(step.cmd || '');
       return '<li class="step">' +
         '<div class="step__cmd">' +
           '<code>' + esc(cmd) + '</code>' +
@@ -99,7 +91,7 @@
   }
 
   function areaSummaryBlock(commands) {
-    var changed = [], kept = [];
+    const changed = [], kept = [];
     commands.forEach(function (step) {
       (step.변경영역 || []).forEach(function (a) { if (changed.indexOf(a) === -1) changed.push(a); });
     });
@@ -121,7 +113,7 @@
 
   /* 위험 명령 6단계 손실 점검 게이트 (기획서 7.4절) */
   function gateBlock() {
-    var steps = [
+    const steps = [
       { text: '현재 상태를 확인했습니다', code: 'git status' },
       { text: '무엇을 잃게 되는지 확인했습니다', code: 'git diff\ngit diff --staged' },
       { text: '커밋하지 않은 변경을 먼저 대피시켰습니다', code: 'git stash push -u -m "backup"' },
@@ -130,12 +122,12 @@
       { text: '이해했습니다. 명령어 복사를 열어주세요', code: null }
     ];
 
-    var items = steps.map(function (s, i) {
-      var codeHtml = s.code
+    const items = steps.map(function (s, i) {
+      const codeHtml = s.code
         ? '<div class="code-block"><pre><code>' + esc(s.code) + '</code></pre>' +
           '<button type="button" class="copy-btn" data-copy="' + esc(s.code) + '">복사</button></div>'
         : '';
-      var loss = i === 4 ? lossListHtml() : '';
+      const loss = i === 4 ? lossListHtml() : '';
       return '<li class="gate__step">' +
         '<label><input type="checkbox" class="gate__check" data-step="' + i + '"> ' + esc(s.text) + '</label>' +
         codeHtml + loss +
@@ -186,16 +178,16 @@
       return;
     }
 
-    var commands = Array.isArray(data.명령어) ? data.명령어 : [];
-    var isDanger = data.위험도 === '위험';
-    var templateId = ALLOWED_TEMPLATES.indexOf(data.그래프템플릿) !== -1 ? data.그래프템플릿 : 'none';
-    var graphHtml = window.renderGraphTemplate(templateId);
+    const commands = Array.isArray(data.명령어) ? data.명령어 : [];
+    const isDanger = data.위험도 === '위험';
+    const templateId = ALLOWED_TEMPLATES.indexOf(data.그래프템플릿) !== -1 ? data.그래프템플릿 : 'none';
+    const graphHtml = window.renderGraphTemplate(templateId);
 
-    var html = '<article class="result">' +
+    const html = '<article class="result">' +
       '<div class="result__head">' +
         '<div class="result__badges">' +
           (opts.source ? '<span class="result__source">' + esc(opts.source) + '</span>' : '') +
-          riskBadge(data.위험도 || '주의') +
+          window.CRUtil.riskBadge(data.위험도 || '주의', { prefix: true }) +
           (WHERE_LABEL[data.오류위치] ? '<span class="result__where">' + esc(WHERE_LABEL[data.오류위치]) + '</span>' : '') +
         '</div>' +
         '<p class="result__summary">' + esc(data.상황요약 || '') + '</p>' +
@@ -221,12 +213,12 @@
 
   /* 게이트 상호작용 */
   function wireGate() {
-    var gate = document.getElementById('riskGate');
-    var stepsList = document.getElementById('stepsList');
-    var progress = document.getElementById('gateProgress');
+    const gate = document.getElementById('riskGate');
+    const stepsList = document.getElementById('stepsList');
+    const progress = document.getElementById('gateProgress');
     if (!gate || !stepsList) return;
 
-    var checks = Array.prototype.slice.call(gate.querySelectorAll('.gate__check'));
+    const checks = Array.prototype.slice.call(gate.querySelectorAll('.gate__check'));
 
     function unlock() {
       stepsList.classList.remove('is-locked');
@@ -237,13 +229,13 @@
     checks.forEach(function (box) {
       box.addEventListener('change', function () {
         box.closest('.gate__step').classList.toggle('is-done', box.checked);
-        var done = checks.filter(function (c) { return c.checked; }).length;
+        const done = checks.filter(function (c) { return c.checked; }).length;
         progress.textContent = done + ' / ' + checks.length + ' 확인';
         if (done === checks.length) unlock();
       });
     });
 
-    var bypass = document.getElementById('gateBypass');
+    const bypass = document.getElementById('gateBypass');
     if (bypass) {
       bypass.addEventListener('click', function () {
         checks.forEach(function (c) { c.checked = true; c.closest('.gate__step').classList.add('is-done'); });
@@ -261,7 +253,7 @@
     region.innerHTML = '<div class="loading"><span class="spinner" aria-hidden="true"></span>' +
       '<span id="loadingText">상황을 살펴보고 있어요…</span></div>';
     return setTimeout(function () {
-      var t = document.getElementById('loadingText');
+      const t = document.getElementById('loadingText');
       if (t) t.textContent = '명령어를 정리하고 있어요. 잠시만요.';
     }, SLOW_MS);
   }
@@ -273,8 +265,10 @@
       (retry ? '<button type="button" class="btn btn--ghost" id="retryBtn">다시 시도</button>' : '') +
       '</div>';
     if (retry) {
-      var btn = document.getElementById('retryBtn');
+      const btn = document.getElementById('retryBtn');
       if (btn) btn.addEventListener('click', function () { submitForm(true); });
+      // 새로 만들어진 버튼에 현재 쿨다운 상태를 즉시 반영한다
+      paintCooldown();
     }
   }
 
@@ -292,10 +286,10 @@
   /*  입력 검증                                                              */
   /* ====================================================================== */
 
-  var softSecretAcknowledged = false;
+  let softSecretAcknowledged = false;
 
   function collectPayload() {
-    var fd = new FormData(form);
+    const fd = new FormData(form);
     return {
       situation: (fd.get('situation') || '').toString().trim(),
       executedCommand: (fd.get('executedCommand') || '').toString().trim(),
@@ -314,9 +308,9 @@
       return '1,000자 이내로 줄여주세요. (현재 ' + payload.situation.length + '자)';
     }
 
-    var joined = [payload.situation, payload.executedCommand, payload.errorMessage, payload.statusOutput].join('\n');
+    const joined = [payload.situation, payload.executedCommand, payload.errorMessage, payload.statusOutput].join('\n');
 
-    for (var i = 0; i < HARD_SECRET_PATTERNS.length; i++) {
+    for (let i = 0; i < HARD_SECRET_PATTERNS.length; i++) {
       if (HARD_SECRET_PATTERNS[i].re.test(joined)) {
         return HARD_SECRET_PATTERNS[i].name + '으로 보이는 값이 있습니다. 지우고 보내주세요. ' +
                '이미 어딘가에 올라간 값이라면 먼저 폐기·재발급하세요.';
@@ -334,9 +328,9 @@
   /*  요청                                                                   */
   /* ====================================================================== */
 
-  function requestOnce(payload) {
-    var controller = new AbortController();
-    var timer = setTimeout(function () { controller.abort(); }, TIMEOUT_MS);
+  function requestOnce(payload, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(function () { controller.abort(); }, timeoutMs);
 
     return fetch('/api/rescue', {
       method: 'POST',
@@ -345,7 +339,7 @@
       signal: controller.signal
     }).then(function (res) {
       return res.text().then(function (text) {
-        var json = null;
+        let json = null;
         try { json = JSON.parse(text); } catch (e) { /* 형식 오류 */ }
         return { status: res.status, ok: res.ok, json: json };
       });
@@ -358,12 +352,33 @@
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
   }
 
-  /* 실패 시 1초 → 2초 → 4초 간격 재시도 (최대 3회, 기획서 7.2절) */
-  function requestWithRetry(payload, attempt) {
-    attempt = attempt || 0;
-    var delays = [1000, 2000, 4000];
+  /* 실패 시 1초 → 2초 → 4초 간격 재시도 (최대 3회, 기획서 7.2절)
+     재시도 자체에 상한을 둔다. 상한이 없으면 매 시도가 TIMEOUT_MS 를 꽉 채울 때
+     사용자는 "20초 안에 응답 아니면 안내"라는 약속(기획서 3.8절)보다 훨씬 오래 기다리게 된다. */
+  const RETRY_DELAYS = [1000, 2000, 4000];
 
-    return requestOnce(payload).then(function (res) {
+  function requestWithRetry(payload, attempt, deadline) {
+    attempt = attempt || 0;
+    deadline = deadline || (Date.now() + TIMEOUT_MS);
+
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {
+      const expired = new Error('deadline exceeded');
+      expired.name = 'AbortError';
+      return Promise.reject(expired);
+    }
+
+    function canRetry() {
+      return attempt < RETRY_DELAYS.length &&
+             Date.now() + RETRY_DELAYS[attempt] < deadline;
+    }
+    function retry() {
+      return sleep(RETRY_DELAYS[attempt]).then(function () {
+        return requestWithRetry(payload, attempt + 1, deadline);
+      });
+    }
+
+    return requestOnce(payload, remaining).then(function (res) {
       if (res.ok && res.json) return res;
 
       // 429는 자동 재시도하지 않는다. 한도 문제이므로 사용자에게 알린다.
@@ -371,25 +386,60 @@
       // 400은 서버가 판단한 입력 오류. 재시도해도 같다.
       if (res.status === 400) return res;
 
-      if (attempt < delays.length) {
-        return sleep(delays[attempt]).then(function () {
-          return requestWithRetry(payload, attempt + 1);
-        });
-      }
-      return res;
+      return canRetry() ? retry() : res;
     }).catch(function (err) {
       if (err && err.name === 'AbortError') throw err;
-      if (attempt < delays.length) {
-        return sleep(delays[attempt]).then(function () {
-          return requestWithRetry(payload, attempt + 1);
-        });
-      }
+      if (canRetry()) return retry();
       throw err;
     });
   }
 
-  var lastPayload = null;
-  var isSending = false;
+  let lastPayload = null;
+  let isSending = false;
+
+  /* ---------------------------- 쿨다운 ----------------------------
+     전송 버튼과 결과 화면의 "다시 시도" 버튼이 같은 쿨다운을 공유한다.
+     예전에는 전송 버튼에만 걸려 있어서, 결과 화면의 재시도 버튼으로
+     10초 잠금을 그대로 우회할 수 있었다 (기획서 7.2절 위반). */
+  const SUBMIT_LABEL = '수습 방법 알려주세요';
+  let cooldownUntil = 0;
+  let cooldownTicker = null;
+
+  function startCooldown(ms) {
+    cooldownUntil = Math.max(cooldownUntil, Date.now() + ms);
+    paintCooldown();
+  }
+  function cooldownLeft() {
+    return Math.max(0, cooldownUntil - Date.now());
+  }
+  function paintCooldown() {
+    const left = cooldownLeft();
+    const secs = Math.ceil(left / 1000);
+    const retryBtn = document.getElementById('retryBtn');
+
+    if (left > 0) {
+      if (!isSending) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = secs + '초 후 다시 시도할 수 있어요';
+      }
+      if (retryBtn) {
+        retryBtn.disabled = true;
+        retryBtn.textContent = secs + '초 후 다시 시도';
+      }
+      if (!cooldownTicker) cooldownTicker = setInterval(paintCooldown, 250);
+    } else {
+      clearInterval(cooldownTicker);
+      cooldownTicker = null;
+      if (!isSending) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = SUBMIT_LABEL;
+      }
+      if (retryBtn) {
+        retryBtn.disabled = false;
+        retryBtn.textContent = '다시 시도';
+      }
+    }
+  }
 
   function lockSubmit() {
     isSending = true;
@@ -398,19 +448,20 @@
   }
   function unlockSubmit() {
     isSending = false;
-    submitBtn.textContent = '수습 방법 알려주세요';
-    // 연타로 무료 할당량을 소모하지 않도록 10초간 잠근다 (기획서 7.2절)
-    setTimeout(function () { submitBtn.disabled = false; }, COOLDOWN_MS);
+    // 연타로 무료 할당량을 소모하지 않도록 잠근다 (기획서 7.2절)
+    startCooldown(COOLDOWN_MS);
   }
 
   function cacheKey(payload) { return 'cr:' + JSON.stringify(payload); }
 
   function submitForm(isRetry) {
     if (isSending) return;
+    // 재시도 버튼도 같은 쿨다운을 지킨다
+    if (cooldownLeft() > 0) { paintCooldown(); return; }
 
-    var payload = isRetry && lastPayload ? lastPayload : collectPayload();
+    const payload = isRetry && lastPayload ? lastPayload : collectPayload();
     if (!isRetry) {
-      var error = validate(payload);
+      const error = validate(payload);
       if (error) { showFormError(error); return; }
       clearFormError();
     }
@@ -418,7 +469,7 @@
 
     // 같은 입력은 다시 호출하지 않는다
     try {
-      var cached = sessionStorage.getItem(cacheKey(payload));
+      const cached = sessionStorage.getItem(cacheKey(payload));
       if (cached) {
         renderResult(JSON.parse(cached), { source: 'AI 생성 (같은 질문이라 저장된 답을 보여드립니다)' });
         return;
@@ -426,14 +477,17 @@
     } catch (e) { /* sessionStorage 사용 불가 환경은 그냥 넘어간다 */ }
 
     lockSubmit();
-    var slowTimer = showLoading();
+    const slowTimer = showLoading();
 
     requestWithRetry(payload)
       .then(function (res) {
         clearTimeout(slowTimer);
 
         if (res.status === 429) {
-          showMessage('지금 이용자가 많습니다.', '30초 후 다시 시도해주세요.', true);
+          // 서버가 알려준 retryAfter 만큼 실제로 잠근다. 안내 문구와 버튼 상태를 일치시킨다.
+          const wait = (res.json && Number(res.json.retryAfter)) || 30;
+          startCooldown(wait * 1000);
+          showMessage('지금 이용자가 많습니다.', wait + '초 후 다시 시도해주세요.', true);
           return;
         }
         if (res.status === 400) {
@@ -475,7 +529,7 @@
     });
 
     situationEl.addEventListener('input', function () {
-      var len = situationEl.value.trim().length;
+      const len = situationEl.value.trim().length;
       countEl.textContent = len.toLocaleString() + ' / 1,000';
       countEl.classList.toggle('is-over', len > MAX_SITUATION);
       if (!errorEl.hidden) clearFormError();

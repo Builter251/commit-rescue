@@ -394,29 +394,25 @@ window.PRESETS = [
 (function () {
   'use strict';
 
-  var grid = document.getElementById('presetGrid');
+  const grid = document.getElementById('presetGrid');
   if (!grid) return;
 
-  var esc = window.CRUtil.escapeHtml;
-  var RISK_CLASS = { '안전': 'safe', '주의': 'warn', '위험': 'danger' };
-  var RISK_ICON = { '안전': '✓', '주의': '!', '위험': '⚠' };
+  const esc = window.CRUtil.escapeHtml;
 
   grid.innerHTML = window.PRESETS.map(function (p, i) {
     return '<button type="button" class="preset" data-index="' + i + '">' +
       '<span class="preset__title">' + esc(p.제목) + '</span>' +
       '<span class="preset__foot">' +
-        '<span class="risk risk--' + RISK_CLASS[p.위험도] + '">' +
-          '<span aria-hidden="true">' + RISK_ICON[p.위험도] + '</span> ' + esc(p.위험도) +
-        '</span>' +
+        window.CRUtil.riskBadge(p.위험도) +
         '<span class="preset__instant">즉시 표시</span>' +
       '</span>' +
       '</button>';
   }).join('');
 
   grid.addEventListener('click', function (e) {
-    var btn = e.target.closest('.preset');
+    const btn = e.target.closest('.preset');
     if (!btn) return;
-    var preset = window.PRESETS[Number(btn.dataset.index)];
+    const preset = window.PRESETS[Number(btn.dataset.index)];
     if (!preset) return;
 
     grid.querySelectorAll('.preset').forEach(function (b) { b.classList.remove('is-active'); });

@@ -320,7 +320,9 @@ def call_gemini(user_prompt):
         # 키가 없는 것은 서버 설정 문제다. 원인을 사용자에게 노출하지 않는다.
         raise UpstreamError(500, "SERVER_ERROR", "일시적인 문제가 발생했습니다.")
 
-    model = os.environ.get("GEMINI_MODEL", DEFAULT_MODEL)
+    # `.get(키, 기본값)`은 환경 변수가 **빈 문자열**일 때 기본값을 쓰지 않는다.
+    # .env.example 을 그대로 복사하면 GEMINI_MODEL 이 빈 값이 되므로 반드시 or 로 받는다.
+    model = os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL
     url = GEMINI_ENDPOINT.format(model=model)
 
     request_body = {
