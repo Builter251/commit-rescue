@@ -76,8 +76,9 @@
   function stepsBlock(commands, locked) {
     const html = commands.map(function (step) {
       const cmd = String(step.cmd || '');
+      // 페이지 어디서나 같은 .code 규칙을 쓴다 (복사 버튼 위치·여백 통일)
       return '<li class="step">' +
-        '<div class="step__cmd">' +
+        '<div class="code">' +
           '<code>' + esc(cmd) + '</code>' +
           '<button type="button" class="copy-btn" data-copy="' + esc(cmd) + '"' + (locked ? ' disabled' : '') + '>복사</button>' +
         '</div>' +
@@ -124,7 +125,7 @@
 
     const items = steps.map(function (s, i) {
       const codeHtml = s.code
-        ? '<div class="code-block"><pre><code>' + esc(s.code) + '</code></pre>' +
+        ? '<div class="code"><pre><code>' + esc(s.code) + '</code></pre>' +
           '<button type="button" class="copy-btn" data-copy="' + esc(s.code) + '">복사</button></div>'
         : '';
       const loss = i === 4 ? lossListHtml() : '';
