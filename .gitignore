@@ -1,0 +1,21 @@
+# 환경 변수 — 절대 커밋하지 않습니다
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+
+# 에디터
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Vercel
+.vercel/
+.env.example

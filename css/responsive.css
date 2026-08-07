@@ -1,0 +1,100 @@
+/* ==========================================================================
+   커밋구조대 — responsive.css
+   모바일 ~767px / 태블릿 768~1023px / 데스크톱 1024px~
+   검증 기준 폭: 375px, 768px, 1280px
+   ========================================================================== */
+
+/* ------------------------- 태블릿 이하 (~1023px) ------------------------- */
+@media (max-width: 1023px) {
+  .result__cols { grid-template-columns: minmax(0, 1fr); }
+  .preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero__values { grid-template-columns: minmax(0, 1fr); }
+  .footer__inner { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ------------------------- 태블릿 (768~1023px) ------------------------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav__link { padding: 8px 9px; font-size: .87rem; }
+  .theme-toggle__text { display: none; }
+  .cmd-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* --------------------------- 모바일 (~767px) --------------------------- */
+@media (max-width: 767px) {
+  :root { --nav-h: 56px; }
+
+  .section { padding: 48px 0; }
+  .section__title { font-size: 1.55rem; }
+  .wrap { padding: 0 16px; }
+
+  /* 햄버거 메뉴 */
+  .nav__toggle { display: block; }
+  .nav__menu {
+    position: absolute; left: 0; right: 0; top: var(--nav-h);
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    padding: 8px 16px 16px;
+    max-height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    display: none;
+  }
+  .nav__menu.is-open { display: flex; }
+  .nav__menu ul { flex-direction: column; gap: 2px; }
+  .nav__link { padding: 13px 12px; font-size: 1rem; }
+  .theme-toggle { margin: 10px 0 0; justify-content: center; }
+  .theme-toggle__text { display: inline; }
+
+  /* 히어로 */
+  .hero__lead { font-size: 1rem; }
+  .hero__actions .btn { flex: 1 1 100%; }
+  .example { padding: 18px; }
+  .example__grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .example__arrow { transform: rotate(90deg); text-align: center; }
+
+  /* 다이어그램 — 세로 배치라 폭은 그대로 두고, 경계 범례를 sticky로 노출 */
+  .boundary-legend { display: flex; }
+  .diagram-wrap { padding: 10px; }
+
+  /* 카드 */
+  .preset-grid { grid-template-columns: minmax(0, 1fr); }
+  .cmd-list { grid-template-columns: minmax(0, 1fr); }
+  .cmd { padding: 16px; }
+
+  /* 폼 */
+  .ai-box { padding: 18px 16px; }
+  .form__actions .btn { flex: 1 1 100%; }
+  .field--radio { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* 결과 */
+  .result__head, .result__body { padding: 18px 16px; }
+  .result__summary { font-size: 1.02rem; }
+  .step { padding: 13px 14px 13px 46px; }
+  .step__cmd { flex-direction: column; }
+  .step__cmd code { width: 100%; }
+
+  /* V2 그래프는 축소하지 않고 가로 스크롤 (라벨 가독성 우선) */
+  .graph-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .commit-graph { min-width: 320px; }
+
+  .gate { padding: 15px 14px; }
+  .gate__step { padding: 11px 12px 11px 42px; }
+
+  .mistake { padding: 16px; }
+  .footer { padding: 32px 0 44px; }
+}
+
+/* ---------------------------- 초소형 (~380px) ---------------------------- */
+@media (max-width: 380px) {
+  .nav__brand span:last-child { font-size: .95rem; }
+  .badge { font-size: .8rem; }
+  .hero__title { font-size: 1.75rem; }
+}
+
+/* --------------------------- 데스크톱 (1024px~) --------------------------- */
+@media (min-width: 1024px) {
+  .theme-toggle__text { display: inline; }
+  .diagram-wrap { padding: 24px 32px; }
+  .areas { max-width: 720px; margin: 0 auto; }
+}
