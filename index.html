@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>커밋구조대 — Git 사고, 명령어와 바뀌는 영역을 함께</title>
-<meta name="description" content="Git 사고를 자연어로 설명하면 수습 명령어와 그 명령이 바꾸는 영역을 함께 보여줍니다. git switch / git restore 기준.">
+<title>커밋구조대 — Git을 그림으로 이해하고, 사고를 수습합니다</title>
+<meta name="description" content="Git을 원고 교정에 비유해 그림으로 보여줍니다. 사고가 났을 때 수습 명령어와 그 명령이 바꾸는 영역을 함께 알려줍니다.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
 <script>
@@ -52,11 +52,10 @@
 
     <nav class="nav__menu" id="navMenu" aria-label="주요 메뉴">
       <ul>
-        <li><a href="#home" class="nav__link">메인</a></li>
-        <li><a href="#basics" class="nav__link">Git 3분 개념</a></li>
+        <li><a href="#home" class="nav__link">한눈에 보기</a></li>
+        <li><a href="#words" class="nav__link">쉬운 말 사전</a></li>
         <li><a href="#rescue" class="nav__link">사고 수습</a></li>
         <li><a href="#commands" class="nav__link">명령어 사전</a></li>
-        <li><a href="#mistakes" class="nav__link">자주 하는 실수</a></li>
       </ul>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
         <span class="theme-toggle__icon" aria-hidden="true">🌙</span>
@@ -68,64 +67,35 @@
 
 <main id="main">
 
-  <!-- ============================ 1. 메인 ============================ -->
-  <section id="home" class="section section--hero" aria-labelledby="home-title">
-    <div class="wrap">
-      <p class="badge badge--standard">
-        <span aria-hidden="true">📌</span>
-        <code>git switch</code> / <code>git restore</code> 기준으로 답합니다
-      </p>
+  <!-- ==================== 1. 한눈에 보기 (시각화가 메인) ==================== -->
+  <section id="home" class="section section--stage" aria-labelledby="home-title">
+    <div class="wrap stage">
 
-      <h1 id="home-title" class="hero__title">
-        Git 사고, <br class="br-mobile">수습 명령어와 <em>바뀌는 영역</em>을 함께.
-      </h1>
-
-      <p class="hero__lead">
-        명령어만 알려주지 않습니다.
-        <strong>어느 영역이 바뀌고 무엇을 잃을 수 있는지</strong> 함께 보여줍니다.
-      </p>
-
-      <div class="hero__actions">
-        <a class="btn btn--primary" href="#rescue">내 상황 수습하러 가기</a>
-        <a class="btn btn--ghost" href="#basics">먼저 3분 개념 보기</a>
+      <div class="stage__head">
+        <h1 id="home-title" class="stage__title">
+          Git은 <em>원고를 고쳐가며 버전을 남기는</em> 일입니다. <br class="br-mobile">어디에 무엇이 담기는지 먼저 보세요.
+        </h1>
+        <p class="stage__lead">
+          명령어만 알려주지 않습니다.
+          <strong>어느 칸이 바뀌고 무엇을 잃을 수 있는지</strong> 그림으로 보여줍니다.
+        </p>
       </div>
 
-      <!-- 사용 예시 미리보기 -->
-      <div class="example" aria-labelledby="example-title">
-        <h2 id="example-title" class="example__title">이렇게 답합니다</h2>
-        <div class="example__grid">
-          <div class="example__in">
-            <span class="example__label">입력</span>
-            <p>“커밋했는데 파일 하나를 빼먹었어요”</p>
-          </div>
-          <div class="example__arrow" aria-hidden="true">→</div>
-          <div class="example__out">
-            <span class="example__label">결과</span>
-            <ol class="example__steps">
-              <li><code>git status</code> <span class="chip chip--keep">아무것도 바꾸지 않음</span></li>
-              <li><code>git add 빠뜨린파일.txt</code> <span class="chip chip--change">스테이징 변경</span></li>
-              <li><code>git commit --amend --no-edit</code> <span class="chip chip--change">로컬 main 변경</span> <span class="chip chip--keep">GitHub 유지</span></li>
-            </ol>
-          </div>
+      <!-- 알약 버튼: 그림 위에 둔다. 그림을 보기 전에 무엇을 고를 수 있는지 먼저 눈에 들어와야 한다. -->
+      <div class="stage__picker">
+        <p class="stage__picker-label" id="pickerLabel">명령어를 눌러 어디가 바뀌는지 보세요</p>
+        <div class="flow-buttons" role="group" aria-labelledby="pickerLabel">
+          <button type="button" class="pill" data-flow="add">git add<span class="pill__ko">담기</span></button>
+          <button type="button" class="pill" data-flow="commit">git commit<span class="pill__ko">버전 남기기</span></button>
+          <button type="button" class="pill" data-flow="push">git push<span class="pill__ko">보내기</span></button>
+          <button type="button" class="pill" data-flow="fetch">git fetch<span class="pill__ko">받아오기</span></button>
+          <button type="button" class="pill" data-flow="merge">git merge<span class="pill__ko">합치기</span></button>
+          <button type="button" class="pill" data-flow="pull">git pull<span class="pill__ko">받아서 합치기</span></button>
+          <button type="button" class="pill" data-flow="restore">git restore<span class="pill__ko">되돌리기</span></button>
+          <button type="button" class="pill" data-flow="restore-staged">git restore --staged<span class="pill__ko">담은 것 빼기</span></button>
+          <button type="button" class="pill pill--reset" data-flow="none">강조 지우기</button>
         </div>
       </div>
-
-      <ul class="hero__values">
-        <li><strong>검색 시간 단축</strong><span>용어를 몰라도 상황 설명만으로 답을 얻습니다.</span></li>
-        <li><strong>사고 예방</strong><span>위험한 명령 전에 잃게 될 것을 먼저 확인합니다.</span></li>
-        <li><strong>정확한 모델</strong><span>로컬 <code>main</code>, <code>origin/main</code>, GitHub <code>main</code>은 서로 다릅니다.</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ============================ 2. Git 3분 개념 ============================ -->
-  <section id="basics" class="section" aria-labelledby="basics-title">
-    <div class="wrap">
-      <h2 id="basics-title" class="section__title">Git 3분 개념</h2>
-      <p class="section__desc">
-        이 서비스의 모든 설명은 아래 <strong>5개 영역</strong>과 <strong>하나의 경계</strong>로 이야기합니다.
-        읽는 곳이 아니라 보는 곳입니다.
-      </p>
 
       <!-- 모바일에서도 경계가 항상 보이게 하는 sticky 범례 -->
       <div class="boundary-legend" id="boundaryLegend" aria-hidden="true">
@@ -136,17 +106,18 @@
 
       <div class="diagram-wrap">
         <!-- ===== V1 : 5영역 다이어그램 ===== -->
-        <svg id="areaDiagram" class="areas" viewBox="0 0 660 700" role="img"
+        <svg id="areaDiagram" class="areas" viewBox="0 0 660 480" role="img"
              aria-labelledby="areaDiagramTitle areaDiagramDesc" preserveAspectRatio="xMidYMid meet">
-          <title id="areaDiagramTitle">Git의 5개 영역과 로컬·원격 경계 다이어그램</title>
+          <title id="areaDiagramTitle">Git의 5개 칸과 내 컴퓨터·GitHub 경계 다이어그램</title>
           <desc id="areaDiagramDesc">
-            내 컴퓨터 안에는 작업 폴더, 스테이징 영역, 로컬 저장소가 있고,
-            로컬 저장소 안에는 내 커밋 기록인 main 포인터와 마지막 fetch 때 본 GitHub 상태를 적어둔 origin/main 포인터가 있습니다.
-            네트워크 경계 밖에 GitHub의 main이 있습니다.
-            git add는 작업 폴더에서 스테이징으로, git commit은 스테이징에서 로컬 main으로,
-            git push는 로컬 main에서 GitHub main으로, git fetch는 GitHub main에서 origin/main으로,
-            git merge는 origin/main에서 로컬 main으로 옮깁니다.
-            git restore 파일은 스테이징에서 작업 폴더로, git restore --staged는 로컬 main에서 스테이징으로 되돌립니다.
+            내 컴퓨터 안에는 작업 폴더(책상), 스테이징 영역(이번 버전에 넣을 것 고르는 자리),
+            로컬 저장소(내 기록함)가 있고, 기록함 안에는 내 원고 기록인 main 줄기와
+            마지막으로 확인한 공유 폴더 상태를 적어둔 origin/main 메모가 있습니다.
+            네트워크 경계 밖에 GitHub의 main, 즉 공유 폴더가 있습니다.
+            git add는 책상에서 고르는 자리로, git commit은 고른 것을 버전으로 남겨 기록함에,
+            git push는 기록함에서 공유 폴더로, git fetch는 공유 폴더에서 origin/main 메모로,
+            git merge는 origin/main에서 내 기록함과 책상으로 옮깁니다.
+            git restore 파일은 고르는 자리에서 책상으로, git restore --staged는 기록함에서 고르는 자리로 되돌립니다.
           </desc>
 
           <defs>
@@ -160,158 +131,215 @@
 
           <!-- 내 컴퓨터 컨테이너 -->
           <g class="areas__container">
-            <rect x="16" y="16" width="628" height="500" rx="18"></rect>
-            <text class="areas__container-label" x="36" y="44">내 컴퓨터 (로컬)</text>
+            <rect x="16" y="10" width="628" height="350" rx="16"></rect>
+            <text class="areas__container-label" x="34" y="32">내 컴퓨터 (로컬)</text>
           </g>
 
           <!-- 1. 작업 폴더 -->
           <g class="area" id="area-work" data-area="work">
-            <rect x="56" y="60" width="548" height="62" rx="12"></rect>
-            <text class="area__name" x="80" y="88">1. 작업 폴더</text>
-            <text class="area__sub" x="80" y="108">지금 편집하고 있는 파일들</text>
+            <rect x="54" y="40" width="552" height="48" rx="11"></rect>
+            <text class="area__name" x="76" y="63">1. 책상 — 작업 폴더</text>
+            <text class="area__sub" x="76" y="80">지금 고치고 있는 파일들</text>
           </g>
 
-          <!-- ② 스테이징 -->
+          <!-- 2. 스테이징 -->
           <g class="area" id="area-staging" data-area="staging">
-            <rect x="56" y="178" width="548" height="62" rx="12"></rect>
-            <text class="area__name" x="80" y="206">2. 스테이징 영역 (index)</text>
-            <text class="area__sub" x="80" y="226">이번 커밋에 담을 목록</text>
+            <rect x="54" y="118" width="552" height="48" rx="11"></rect>
+            <text class="area__name" x="76" y="141">2. 이번 버전에 넣을 것 고르는 자리 — 스테이징 (index)</text>
+            <text class="area__sub" x="76" y="158">이번 버전에 넣을 파일만 골라두는 곳</text>
           </g>
 
-          <!-- ③④ 로컬 저장소 -->
+          <!-- 3·4 로컬 저장소 -->
           <g class="area area--repo" id="area-repo">
-            <rect x="56" y="296" width="548" height="204" rx="12"></rect>
-            <text class="area__name" x="80" y="322">로컬 저장소 (.git)</text>
+            <rect x="54" y="196" width="552" height="156" rx="11"></rect>
+            <text class="area__name" x="76" y="216">내 기록함 — 로컬 저장소 (.git)</text>
 
             <g class="area" id="area-local" data-area="local">
-              <rect x="76" y="332" width="230" height="110" rx="10"></rect>
-              <text class="area__name area__name--sm" x="92" y="360">3. main</text>
-              <text class="area__sub" x="92" y="382">내 커밋 기록</text>
-              <text class="area__sub" x="92" y="402">commit이 여기까지</text>
-              <text class="area__sub" x="92" y="422">쌓입니다</text>
+              <rect x="74" y="226" width="232" height="86" rx="9"></rect>
+              <text class="area__name area__name--sm" x="90" y="248">3. main 줄기</text>
+              <text class="area__sub" x="90" y="267">내가 남긴 버전들</text>
+              <text class="area__sub" x="90" y="284">버전을 남기면</text>
+              <text class="area__sub" x="90" y="301">줄기도 따라 옮겨감</text>
             </g>
 
             <g class="area area--dashed" id="area-origin" data-area="origin-tracking">
-              <rect x="352" y="332" width="236" height="110" rx="10"></rect>
-              <text class="area__name area__name--sm" x="368" y="360">4. origin/main</text>
-              <text class="area__sub" x="368" y="382">마지막 fetch 기록</text>
-              <text class="area__sub" x="368" y="402">GitHub 상태를 적어둔</text>
-              <text class="area__sub" x="368" y="422">내 컴퓨터 안의 메모</text>
+              <rect x="354" y="226" width="232" height="86" rx="9"></rect>
+              <text class="area__name area__name--sm" x="370" y="248">4. origin/main 메모</text>
+              <text class="area__sub" x="370" y="267">마지막으로 확인했을 때</text>
+              <text class="area__sub" x="370" y="284">공유 폴더가 어디까지였는지</text>
+              <text class="area__sub" x="370" y="301">적어둔 메모 (내 컴퓨터에 있음)</text>
             </g>
 
             <!-- git merge origin/main -->
             <g class="flow" id="arrow-merge">
-              <path d="M470,442 L470,468 L191,468 L191,446" marker-end="url(#arw)"></path>
-              <text class="flow__label" x="330" y="490" text-anchor="middle">git merge origin/main</text>
+              <path d="M470,312 L470,328 L190,328 L190,316" marker-end="url(#arw)"></path>
+              <text class="flow__label" x="330" y="345" text-anchor="middle">git merge origin/main</text>
             </g>
           </g>
 
           <!-- 네트워크 경계 -->
           <g class="areas__net">
-            <line x1="56" y1="548" x2="604" y2="548"></line>
-            <text x="330" y="542" text-anchor="middle">↕ 네트워크 (인터넷이 필요한 구간)</text>
+            <line x1="54" y1="386" x2="606" y2="386"></line>
+            <text x="330" y="380" text-anchor="middle">↕ 네트워크 (인터넷이 필요한 구간)</text>
           </g>
 
-          <!-- ⑤ GitHub -->
+          <!-- 5. GitHub -->
           <g class="area area--remote" id="area-remote" data-area="remote">
-            <rect x="56" y="590" width="548" height="76" rx="12"></rect>
-            <text class="area__name" x="80" y="622">5. GitHub의 main</text>
-            <text class="area__sub" x="80" y="644">동료도 보고 있는 실제 원격 상태</text>
+            <rect x="54" y="406" width="552" height="58" rx="11"></rect>
+            <text class="area__name" x="76" y="431">5. 공유 폴더 — GitHub의 main</text>
+            <text class="area__sub" x="76" y="451">동료도 함께 보는 진짜 원격 상태</text>
           </g>
 
           <!-- 화살표들 -->
           <g class="flow" id="arrow-add">
-            <path d="M170,122 L170,174" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="184" y="154">git add</text>
+            <path d="M168,88 L168,114" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="182" y="107">git add</text>
           </g>
           <g class="flow flow--back" id="arrow-restore-work">
-            <path d="M470,178 L470,126" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="456" y="154" text-anchor="end">git restore &lt;파일&gt;</text>
+            <path d="M472,118 L472,92" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="458" y="107" text-anchor="end">git restore &lt;파일&gt;</text>
           </g>
 
           <g class="flow" id="arrow-commit">
-            <path d="M170,240 L170,292" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="184" y="272">git commit</text>
+            <path d="M168,166 L168,192" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="182" y="185">git commit</text>
           </g>
           <g class="flow flow--back" id="arrow-restore-staged">
-            <path d="M470,296 L470,244" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="456" y="272" text-anchor="end">git restore --staged</text>
+            <path d="M472,196 L472,170" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="458" y="185" text-anchor="end">git restore --staged</text>
           </g>
 
           <g class="flow" id="arrow-push">
-            <path d="M170,442 L170,586" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="184" y="530">git push</text>
+            <path d="M168,312 L168,402" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="182" y="370">git push</text>
           </g>
           <g class="flow flow--back" id="arrow-fetch">
-            <path d="M500,590 L500,446" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="486" y="530" text-anchor="end">git fetch</text>
+            <path d="M502,406 L502,316" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="488" y="370" text-anchor="end">git fetch</text>
           </g>
         </svg>
       </div>
 
-      <p class="diagram-caption">
-        <code>git pull</code>은 따로 그리지 않습니다. <strong><code>fetch</code> + <code>merge</code></strong>이기 때문입니다.
-        아래 버튼으로 두 화살표가 연달아 강조되는 것을 확인해보세요.
+      <p class="flow-desc" id="flowDesc" aria-live="polite">
+        위 버튼을 누르면 그 명령이 어느 칸에서 어느 칸으로 옮기는지 그림에 표시됩니다.
       </p>
 
-      <div class="flow-buttons" role="group" aria-label="명령어별 영향 영역 확인">
-        <button type="button" class="pill" data-flow="add">git add</button>
-        <button type="button" class="pill" data-flow="commit">git commit</button>
-        <button type="button" class="pill" data-flow="push">git push</button>
-        <button type="button" class="pill" data-flow="fetch">git fetch</button>
-        <button type="button" class="pill" data-flow="merge">git merge</button>
-        <button type="button" class="pill" data-flow="pull">git pull (fetch+merge)</button>
-        <button type="button" class="pill" data-flow="restore">git restore &lt;파일&gt;</button>
-        <button type="button" class="pill" data-flow="restore-staged">git restore --staged</button>
-        <button type="button" class="pill pill--reset" data-flow="none">강조 지우기</button>
-      </div>
-      <p class="flow-desc" id="flowDesc" aria-live="polite">명령어를 누르면 어느 영역에서 어느 영역으로 움직이는지 표시됩니다.</p>
-
-      <h3 class="sub-title">꼭 가져가야 할 네 가지</h3>
-      <ol class="facts">
-        <li>
-          <strong><code>git commit</code>은 GitHub에 아무것도 보내지 않습니다.</strong>
-          <span>인터넷이 끊겨도 동작합니다. GitHub에 반영되는 것은 <code>git push</code> 뿐입니다.</span>
-        </li>
-        <li>
-          <strong><code>git add</code>한 파일과 작업 폴더의 파일은 서로 다른 버전일 수 있습니다.</strong>
-          <span>그래서 스테이징을 별도의 영역으로 봅니다.</span>
-        </li>
-        <li>
-          <strong><code>origin/main</code>은 GitHub에 있는 것이 아니라 내 컴퓨터에 있습니다.</strong>
-          <span>마지막으로 <code>fetch</code>했을 때 본 GitHub 상태를 적어둔 메모입니다. 동료가 push해도 내가 <code>fetch</code>하기 전까지 움직이지 않습니다.</span>
-        </li>
-        <li>
-          <strong><code>git fetch</code>는 원격의 커밋을 실제로 받아와 <code>origin/main</code>을 갱신합니다.</strong>
-          <span>다만 로컬 <code>main</code>과 작업 파일에는 자동으로 합치지 않습니다. 합치는 것은 <code>merge</code>이고, <code>pull</code>은 <code>fetch</code> + <code>merge</code>입니다.</span>
-        </li>
-      </ol>
-
-      <div class="callout callout--tip">
-        <h3>시작할 때 한 번만 해두면 좋은 설정</h3>
-        <div class="code-block">
-          <pre><code>git config --global init.defaultBranch main
-git config --global push.autoSetupRemote true</code></pre>
-          <button class="copy-btn" type="button" data-copy="git config --global init.defaultBranch main&#10;git config --global push.autoSetupRemote true">복사</button>
-        </div>
-        <p>
-          두 번째 설정은 Git 2.37.0부터 쓸 수 있고,
-          첫 push에서 만나는 <code>fatal: The current branch has no upstream branch</code> 에러를 통째로 없애줍니다.
-        </p>
+      <div class="stage__actions">
+        <a class="btn btn--primary" href="#rescue">사고가 났어요, 수습하러 가기</a>
+        <a class="btn btn--ghost" href="#words">용어부터 쉽게 볼게요</a>
       </div>
     </div>
   </section>
 
-  <!-- ============================ 3. 사고 수습 ============================ -->
-  <section id="rescue" class="section section--alt" aria-labelledby="rescue-title">
+  <!-- ==================== 2. 쉬운 말 사전 ==================== -->
+  <section id="words" class="section section--alt" aria-labelledby="words-title">
+    <div class="wrap">
+      <h2 id="words-title" class="section__title">쉬운 말 사전</h2>
+      <p class="section__desc">
+        Git 용어는 처음 보면 다 낯섭니다. 이 서비스는 <strong>쉬운 말을 앞에 두고 원래 용어를 나란히 적습니다.</strong>
+        검색할 때는 원래 용어가 필요하니까요.
+      </p>
+
+      <ul class="words">
+        <li class="word">
+          <p class="word__easy">버전 하나</p>
+          <p class="word__real"><code>커밋 commit</code></p>
+          <p class="word__desc">그 순간 프로젝트 전체의 모습을 찍어 남긴 것. 한 번 찍으면 언제든 그때로 돌아가 볼 수 있습니다.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">이번 버전에 넣을 것 고르기</p>
+          <p class="word__real"><code>스테이징 staging · index</code></p>
+          <p class="word__desc">파일 10개를 고쳐도 <em>고른 3개만</em> 그 버전에 들어갑니다. 이 고르는 단계가 Git과 그냥 백업의 결정적 차이입니다.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">내 기록함</p>
+          <p class="word__real"><code>로컬 저장소 .git</code></p>
+          <p class="word__desc">떠둔 버전이 쌓이는 곳. <strong>내 컴퓨터 안에 있습니다.</strong> 인터넷이 끊겨도 버전을 남겨둘 수 있는 이유입니다.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">작업 줄기</p>
+          <p class="word__real"><code>브랜치 branch</code></p>
+          <p class="word__desc">같은 원고에서 갈라져 나와 따로 고쳐나가는 줄기. “지금 여기까지”를 가리키는 이름표이기도 해서, 새 버전을 남기면 이름표도 따라 옮겨갑니다. 줄기를 하나 더 만들면 원고가 두 줄기로 나뉘어 각자 고쳐나갈 수 있습니다.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">지금 내가 있는 곳</p>
+          <p class="word__real"><code>HEAD</code></p>
+          <p class="word__desc">여러 줄기 중 <em>지금 내가 서 있는 자리</em>. 보통은 <code>main</code> 줄기와 같은 자리에 있습니다.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">공유 폴더</p>
+          <p class="word__real"><code>원격 저장소 remote · GitHub</code></p>
+          <p class="word__desc">팀이 함께 보는 공유 폴더. 내가 <strong>보내기 전까지는</strong> 내 버전이 여기 없습니다.</p>
+        </li>
+        <li class="word word--key">
+          <p class="word__easy">공유 폴더 메모</p>
+          <p class="word__real"><code>origin/main</code></p>
+          <p class="word__desc">
+            <strong>가장 헷갈리는 것.</strong> 공유 폴더 자체가 아니라, 내가 <em>마지막으로 확인했을 때</em>
+            공유 폴더가 어디까지였는지 적어둔 메모입니다. <strong>이 메모는 내 컴퓨터에 있습니다.</strong>
+            동료가 새 버전을 보내도, 내가 받아오기 전까지 이 메모는 그대로입니다.
+          </p>
+        </li>
+        <li class="word">
+          <p class="word__easy">원고 통째로 복사해 오기</p>
+          <p class="word__real"><code>클론 clone</code></p>
+          <p class="word__desc">공유 폴더을 내 컴퓨터로 처음 한 번 통째로 가져오는 것.</p>
+        </li>
+        <li class="word">
+          <p class="word__easy">두 줄기로 나뉜 원고를 하나로 합치기</p>
+          <p class="word__real"><code>머지 merge</code></p>
+          <p class="word__desc">따로 고쳐온 두 줄기로 나뉜 원고를 하나로 모읍니다. 편집자가 두 원고를 나란히 놓고 합치는 것과 같습니다.</p>
+        </li>
+        <li class="word word--key">
+          <p class="word__easy">같은 문장을 서로 다르게 고침</p>
+          <p class="word__real"><code>충돌 conflict</code></p>
+          <p class="word__desc">
+            두 줄기로 나뉜 원고를 합치려는데, <em>같은 줄</em>을 한쪽은 A로 다른 쪽은 B로 고쳐놨을 때 생깁니다.
+            Git은 어느 쪽이 맞는지 알 수 없어서 <strong>“여기는 네가 정해라”</strong>하고 멈춥니다.
+            겁먹을 일이 아니라 <em>편집자에게 결정을 넘긴 것</em>입니다. 파일을 열어 남길 쪽만 남기고
+            <code>git add</code> 한 뒤 이어서 진행하면 됩니다.
+          </p>
+        </li>
+        <li class="word">
+          <p class="word__easy">잠깐 치워두기</p>
+          <p class="word__real"><code>스태시 stash</code></p>
+          <p class="word__desc">아직 버전 남기기 아까운 작업물을 서랍에 잠깐 넣어두는 것. 나중에 다시 꺼낼 수 있습니다.</p>
+        </li>
+      </ul>
+
+      <div class="callout callout--tip">
+        <h3>비유는 여기까지입니다</h3>
+        <p>
+          원고 비유는 <strong>어디에 무엇이 담기는지</strong>를 잡는 데까지만 씁니다.
+          Git이 실제로는 파일 전체를 매번 복사하지 않고 달라진 부분만 영리하게 저장하지만,
+          처음 배울 때 그건 몰라도 됩니다. 익숙해지면 원래 용어만 쓰게 됩니다.
+        </p>
+      </div>
+
+      <h3 class="sub-title">시작할 때 한 번만 해두면 좋은 설정</h3>
+      <div class="code">
+        <pre><code>git config --global init.defaultBranch main
+git config --global push.autoSetupRemote true</code></pre>
+        <button class="copy-btn" type="button" data-copy="git config --global init.defaultBranch main&#10;git config --global push.autoSetupRemote true">복사</button>
+      </div>
+      <p class="note">
+        두 번째 설정은 Git 2.37.0부터 쓸 수 있고, 첫 올리기에서 만나는
+        <code>fatal: The current branch has no upstream branch</code> 오류를 통째로 없애줍니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 3. 사고 수습 ==================== -->
+  <section id="rescue" class="section" aria-labelledby="rescue-title">
     <div class="wrap">
       <h2 id="rescue-title" class="section__title">사고 수습</h2>
       <p class="section__desc">
-        흔한 상황 8개는 <strong>미리 검수한 답</strong>을 바로 보여줍니다 (AI를 호출하지 않습니다).
-        목록에 없는 상황만 아래 입력창을 이용하세요.
+        <strong>지금 문제가 난 사람을 위한 곳입니다.</strong>
+        아래 8개는 미리 검수해둔 답이라 누르면 바로 나옵니다 (AI를 호출하지 않습니다).
+        목록에 없으면 그 아래 입력창을 쓰세요.
       </p>
 
-      <h3 class="sub-title">흔한 상황은 여기서 바로</h3>
+      <h3 class="sub-title">지금 어떤 상황인가요?</h3>
       <div class="preset-grid" id="presetGrid">
         <!-- js/presets.js 가 채웁니다 -->
       </div>
@@ -321,8 +349,8 @@ git config --global push.autoSetupRemote true</code></pre>
         <form id="rescueForm" class="form" novalidate aria-labelledby="aiFormTitle">
           <div class="field">
             <label for="situation">어떤 상황인가요? <span class="req">필수</span></label>
-            <textarea id="situation" name="situation" rows="4" maxlength="1200"
-              placeholder="예) 어제 만든 브랜치에서 작업하다가 실수로 main에 머지했는데, 그 전에 커밋 하나를 빼먹은 것 같아요"
+            <textarea id="situation" name="situation" rows="3" maxlength="1200"
+              placeholder="예) 어제 만든 줄기에서 작업하다가 실수로 main에 합쳤는데, 그 전에 버전 하나를 빼먹은 것 같아요"
               aria-describedby="situationHelp situationCount"></textarea>
             <div class="field__meta">
               <span id="situationHelp" class="field__help">5자 이상 1,000자 이내로 적어주세요.</span>
@@ -340,17 +368,17 @@ git config --global push.autoSetupRemote true</code></pre>
               </div>
               <div class="field">
                 <label for="errorMessage">오류 메시지</label>
-                <textarea id="errorMessage" name="errorMessage" rows="3" maxlength="1000"
+                <textarea id="errorMessage" name="errorMessage" rows="2"maxlength="1000"
                           placeholder="터미널에 나온 빨간 글씨를 그대로 붙여넣어도 됩니다"></textarea>
               </div>
               <div class="field">
                 <label for="statusOutput"><code>git status</code> 결과</label>
-                <textarea id="statusOutput" name="statusOutput" rows="3" maxlength="1000"
+                <textarea id="statusOutput" name="statusOutput" rows="2" maxlength="1000"
                           placeholder="가장 도움이 되는 정보입니다"></textarea>
               </div>
 
               <fieldset class="field field--radio">
-                <legend>이미 push했나요?</legend>
+                <legend>이미 공유 폴더에 올렸나요? <span class="legend__real">(push)</span></legend>
                 <label><input type="radio" name="alreadyPushed" value="yes"> 예</label>
                 <label><input type="radio" name="alreadyPushed" value="no"> 아니요</label>
                 <label><input type="radio" name="alreadyPushed" value="unknown" checked> 모르겠음</label>
@@ -384,13 +412,15 @@ git config --global push.autoSetupRemote true</code></pre>
     </div>
   </section>
 
-  <!-- ============================ 4. 명령어 사전 ============================ -->
-  <section id="commands" class="section" aria-labelledby="commands-title">
+  <!-- ==================== 4. 명령어 사전 ==================== -->
+  <section id="commands" class="section section--alt" aria-labelledby="commands-title">
     <div class="wrap">
       <h2 id="commands-title" class="section__title">명령어 사전</h2>
       <p class="section__desc">
-        알파벳순이 아니라 <strong>상황순</strong>입니다. 카드를 누르면 위쪽
-        <a href="#basics">5영역 다이어그램</a>에서 그 명령이 건드리는 영역이 강조됩니다.
+        알파벳순이 아니라 <strong>상황순</strong>입니다. 각 카드의 “영향 영역 보기”를 누르면
+        <a href="#home">맨 위 그림</a>에서 그 명령이 건드리는 칸이 강조됩니다.
+        <strong>옵션은 짧은 형태(<code>-m</code>)와 긴 형태(<code>--message</code>)를 함께 적었습니다.</strong>
+        검색하면 둘 다 나오는데 같은 것인 줄 모르면 헷갈리기 때문입니다.
       </p>
 
       <ul class="cmd-list">
@@ -398,64 +428,137 @@ git config --global push.autoSetupRemote true</code></pre>
         <li class="cmd" data-flow="none">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
+            <h3>원고 시작하기 · 받아오기</h3>
+          </div>
+          <code class="cmd__code">git init -b main</code>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함(.git)이 새로 생김</p>
+          <p class="cmd__desc"><code>-b main</code>을 빼면 Git 설정에 따라 첫 줄기 이름이 <code>master</code>가 될 수 있습니다.</p>
+          <details class="more">
+            <summary>이미 있는 원고를 받아오려면 · 주소 확인</summary>
+            <ul class="opts">
+              <li><code>git clone &lt;주소&gt;</code> — 공유 폴더을 내 컴퓨터로 통째로 복사해 옵니다 (처음 한 번)</li>
+              <li><code>git remote -v</code> — 지금 어느 공유 폴더에 연결돼 있는지 봅니다 (<code>-v</code> = <code>--verbose</code>)</li>
+              <li><code>git remote add origin &lt;주소&gt;</code> — 연결이 없을 때 새로 맺습니다</li>
+              <li><code>git remote set-url origin &lt;주소&gt;</code> — 연결된 주소를 바꿉니다</li>
+              <li><code>--global</code> 은 이 컴퓨터 전체 설정, <code>--local</code> 은 이 저장소만의 설정입니다</li>
+            </ul>
+          </details>
+        </li>
+
+        <li class="cmd" data-flow="none">
+          <div class="cmd__head">
+            <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
             <h3>지금 상태 확인</h3>
           </div>
           <code class="cmd__code">git status</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 없음 (조회만 합니다)</p>
-          <p class="cmd__desc">무엇을 하든 여기서 시작합니다. 어떤 파일이 어느 영역에 있는지 한 번에 보여줍니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 없음 (보기만 합니다)</p>
+          <p class="cmd__desc">무엇을 하든 여기서 시작합니다. 어떤 파일이 어느 칸에 있는지 한 번에 보여줍니다.</p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-s</code> = <code>--short</code> — 짧게 요약해서 봅니다</li>
+              <li><code>-b</code> = <code>--branch</code> — 지금 어느 줄기(브랜치)에 있는지 같이 보여줍니다</li>
+              <li><code>git diff</code> — 책상과 고르는 자리의 차이</li>
+              <li><code>git diff --staged</code> = <code>git diff --cached</code> — 고르는 자리와 마지막 버전의 차이. <strong>두 이름이 같은 뜻</strong>인데 검색하면 둘 다 나옵니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="add">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>커밋에 담을 파일 고르기</h3>
+            <h3>이번 버전에 넣을 파일 고르기</h3>
           </div>
           <code class="cmd__code">git add &lt;파일&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 작업 폴더 → 스테이징</p>
-          <p class="cmd__desc">작업 폴더에서 10개를 고쳐도, <code>add</code>한 것만 커밋됩니다. 이 선택 단계가 Git과 단순 백업의 차이입니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 책상 → 고르는 자리 (작업 폴더 → 스테이징)</p>
+          <p class="cmd__desc">파일 10개를 고쳐도 <code>add</code>한 것만 그 버전에 들어갑니다.</p>
+          <details class="more">
+            <summary>전부 담는 세 가지 방법 · 옵션 풀어쓰기</summary>
+            <div class="callout callout--warn callout--inline">
+              <p><strong><code>git add .</code> 과 <code>git add -A</code> 는 미묘하게 다릅니다.</strong></p>
+              <p>
+                <code>.</code> 은 <strong>지금 있는 폴더와 그 아래만</strong> 담습니다.
+                <code>-A</code> 는 <strong>어느 폴더에 있든 저장소 전체를</strong> 담습니다.
+                프로젝트 최상위에서 실행하면 결과가 같아서 차이를 못 느끼지만,
+                하위 폴더에서 실행하면 <code>.</code> 은 위쪽 폴더의 변경을 빠뜨립니다.
+              </p>
+            </div>
+            <ul class="opts">
+              <li><code>git add .</code> — 현재 폴더와 그 아래 전부 (가장 많이 쓰는 형태)</li>
+              <li><code>-A</code> = <code>--all</code> — 저장소 전체 전부</li>
+              <li><code>-u</code> = <code>--update</code> — 이미 Git이 알고 있는 파일만 (새 파일 제외)</li>
+              <li><code>-p</code> = <code>--patch</code> — 파일 안에서 부분만 골라 담기</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="commit">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>기록 남기기</h3>
+            <h3>버전 남기기 (기록 남기기)</h3>
           </div>
           <code class="cmd__code">git commit -m "메시지"</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 스테이징 → 로컬 <code>main</code></p>
-          <p class="cmd__desc">내 컴퓨터의 <code>.git</code> 폴더에만 기록됩니다. GitHub에는 아무것도 가지 않습니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 고르는 자리 → 내 기록함 (스테이징 → 로컬 <code>main</code>)</p>
+          <p class="cmd__desc">내 컴퓨터의 <code>.git</code> 기록함에만 남습니다. <strong>GitHub에는 아무것도 가지 않습니다.</strong></p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-m</code> = <code>--message</code> — 버전에 붙일 설명을 바로 적습니다</li>
+              <li><code>-a</code> = <code>--all</code> — 고르는 단계를 건너뛰고 바뀐 것을 바로 찍습니다 (새 파일은 제외)</li>
+              <li><code>git commit -am "메시지"</code> — <code>-a</code>와 <code>-m</code>을 붙여 쓴 것입니다. 짧은 옵션은 이렇게 합칠 수 있습니다</li>
+              <li><code>--amend</code> — <strong>짧은 형태가 없습니다.</strong> 방금 만든 버전을 다시 찍습니다</li>
+              <li><code>--no-edit</code> — <strong>짧은 형태가 없습니다.</strong> 설명은 그대로 두겠다는 뜻입니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="push">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>GitHub에 올리기</h3>
+            <h3>공유 폴더에 올리기</h3>
           </div>
           <code class="cmd__code">git push</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 <code>main</code> → GitHub <code>main</code> (+ <code>origin/main</code> 갱신)</p>
-          <p class="cmd__desc">여기서 처음으로 인터넷이 필요합니다. 성공하면 <code>origin/main</code> 메모도 함께 최신이 됩니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함 → 공유 폴더 (+ <code>origin/main</code> 메모 갱신)</p>
+          <p class="cmd__desc">여기서 처음으로 인터넷이 필요합니다. 성공하면 메모도 함께 최신이 됩니다.</p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-u</code> = <code>--set-upstream</code> — “이 줄기는 앞으로 여기에 올린다”를 한 번 정해둡니다</li>
+              <li><code>-f</code> = <code>--force</code> — <strong>강제로 덮어씁니다. 동료의 버전이 사라질 수 있습니다</strong></li>
+              <li><code>-d</code> = <code>--delete</code> — 공유 폴더 쪽 줄기를 지웁니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="fetch">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>원격 정보 받아오기</h3>
+            <h3>공유 폴더 소식 받아오기</h3>
           </div>
           <code class="cmd__code">git fetch</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> GitHub → 로컬 저장소 + <code>origin/main</code></p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 공유 폴더 → <code>origin/main</code> 메모</p>
           <p class="cmd__desc">
-            “확인만 하는 명령”이 아닙니다. 원격의 커밋 객체를 <strong>실제로 내려받아</strong> <code>origin/main</code>을 갱신합니다.
-            다만 로컬 <code>main</code>과 작업 파일은 건드리지 않으므로, 안심하고 자주 실행해도 됩니다.
+            “확인만 하는 명령”이 아닙니다. 새 버전을 <strong>실제로 내려받아</strong> 메모를 갱신합니다.
+            다만 내 기록함과 책상은 건드리지 않으므로 안심하고 자주 실행해도 됩니다.
           </p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-p</code> = <code>--prune</code> — 공유 폴더에서 사라진 줄기를 내 쪽 목록에서도 정리합니다</li>
+              <li><code>-t</code> = <code>--tags</code> — 태그도 함께 받아옵니다</li>
+              <li><code>--all</code> — <strong>짧은 형태가 없습니다.</strong> (<code>-a</code>는 <code>--append</code>라 뜻이 다릅니다)</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="pull">
           <div class="cmd__head">
             <span class="risk risk--warn"><span aria-hidden="true">!</span> 주의</span>
-            <h3>원격 내용 가져와 합치기</h3>
+            <h3>받아와서 합치기</h3>
           </div>
           <code class="cmd__code">git pull</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> <code>fetch</code> 후 <code>origin/main</code> → 로컬 <code>main</code> → 작업 폴더</p>
-          <p class="cmd__desc"><code>fetch</code> + <code>merge</code>입니다. 작업 폴더까지 바뀌므로 충돌이 날 수 있습니다. 먼저 <code>git status</code>로 정리된 상태인지 확인하세요.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 메모 → 내 기록함 → 책상 (세 칸 전부)</p>
+          <p class="cmd__desc"><code>fetch</code> + <code>merge</code>입니다. 책상까지 바뀌므로 충돌이 날 수 있습니다. 먼저 <code>git status</code>로 정리된 상태인지 확인하세요.</p>
         </li>
 
         <li class="cmd cmd--flag" data-flow="restore">
@@ -464,221 +567,227 @@ git config --global push.autoSetupRemote true</code></pre>
             <h3>파일 수정 취소</h3>
           </div>
           <code class="cmd__code">git restore &lt;파일&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> <strong>스테이징 → 작업 폴더</strong></p>
-          <p class="cmd__desc">기본 소스는 <code>HEAD</code>가 아니라 <strong>index(스테이징 영역)</strong>입니다. 이 차이가 함정을 만듭니다.</p>
-          <div class="callout callout--warn callout--inline">
-            <p>
-              <code>git add app.js</code>를 한 뒤 <code>git restore app.js</code>를 실행하면 아무 일도 일어나지 않은 것처럼 보입니다.
-              스테이징에 이미 <code>add</code>한 내용이 들어 있고, <code>restore</code>는 거기서 가져오기 때문입니다.
-            </p>
-            <p>마지막 커밋 상태로 되돌리려면 <code>git restore --source=HEAD -- app.js</code>를 쓰세요.</p>
-          </div>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> <strong>고르는 자리 → 책상</strong></p>
+          <p class="cmd__desc">가져오는 기준이 <code>HEAD</code>가 아니라 <strong>고르는 자리(스테이징)</strong>입니다. 이 차이가 함정을 만듭니다.</p>
+          <details class="more" open>
+            <summary>가장 많이 걸리는 함정</summary>
+            <div class="callout callout--warn callout--inline">
+              <p>
+                <code>git add app.js</code> 한 뒤 <code>git restore app.js</code>를 실행하면 아무 일도 없는 것처럼 보입니다.
+                고르는 자리에 이미 담아둔 내용이 있고, <code>restore</code>는 <em>거기서</em> 가져오기 때문입니다.
+              </p>
+              <p>마지막 버전 상태로 되돌리려면 <code>git restore --source=HEAD -- app.js</code>를 쓰세요.</p>
+            </div>
+            <ul class="opts">
+              <li><code>-s</code> = <code>--source</code> — 어디서 가져올지 정합니다 (<code>--source=HEAD</code>)</li>
+              <li><code>-S</code> = <code>--staged</code> — 고르는 자리를 되돌립니다 (대문자입니다)</li>
+              <li><code>-W</code> = <code>--worktree</code> — 책상을 되돌립니다 (기본값)</li>
+              <li><code>-p</code> = <code>--patch</code> — 부분만 골라 되돌립니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="restore-staged">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3><code>add</code> 취소</h3>
+            <h3>담은 것 도로 빼기</h3>
           </div>
           <code class="cmd__code">git restore --staged &lt;파일&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 <code>main</code>(HEAD) → 스테이징</p>
-          <p class="cmd__desc">스테이징에서만 내립니다. <strong>작업 폴더의 수정 내용은 그대로 남습니다.</strong> 그래서 안전합니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함(HEAD) → 고르는 자리</p>
+          <p class="cmd__desc">고르는 자리에서만 뺍니다. <strong>책상에서 고친 내용은 그대로 남습니다.</strong> 그래서 안전합니다.</p>
+          <details class="more">
+            <summary>옵션 풀어쓰기 · 옛날 방식</summary>
+            <ul class="opts">
+              <li><code>-S</code> = <code>--staged</code> — 위 명령의 짧은 형태는 <code>git restore -S &lt;파일&gt;</code>입니다</li>
+              <li>검색하면 나오는 <code>git reset HEAD &lt;파일&gt;</code>과 같은 일을 합니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="restore-head">
           <div class="cmd__head">
             <span class="risk risk--warn"><span aria-hidden="true">!</span> 주의</span>
-            <h3>마지막 커밋 상태로 파일 되돌리기</h3>
+            <h3>마지막 버전 상태로 파일 되돌리기</h3>
           </div>
           <code class="cmd__code">git restore --source=HEAD -- &lt;파일&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 <code>main</code>(HEAD) → 작업 폴더</p>
-          <p class="cmd__desc">커밋하지 않은 수정이 사라집니다. 되돌릴 수 없으니 <code>git diff</code>로 무엇이 사라지는지 먼저 보세요.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함(HEAD) → 책상</p>
+          <p class="cmd__desc">아직 버전으로 남기지 않은 수정이 사라집니다. 되돌릴 수 없으니 <code>git diff</code>로 무엇이 사라지는지 먼저 보세요.</p>
         </li>
 
         <li class="cmd" data-flow="switch">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>브랜치 이동</h3>
+            <h3>다른 줄기로 옮겨가기</h3>
           </div>
           <code class="cmd__code">git switch &lt;브랜치&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 저장소 → 스테이징 + 작업 폴더</p>
-          <p class="cmd__desc">커밋하지 않은 수정이 있으면 Git이 이동을 막아줍니다. 새로 만들면서 이동하려면 <code>git switch -c &lt;브랜치&gt;</code>.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함 → 고르는 자리 + 책상</p>
+          <p class="cmd__desc">아직 버전으로 남기지 않은 수정이 있으면 Git이 이동을 막아줍니다.</p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-c</code> = <code>--create</code> — 새 줄기를 만들면서 옮겨갑니다</li>
+              <li><code>-C</code> = <code>--force-create</code> — 이미 있어도 덮어쓰며 만듭니다</li>
+              <li><code>-d</code> = <code>--detach</code> — 줄기 이름 없이 특정 버전만 펼쳐 봅니다</li>
+              <li><code>git switch -</code> — 바로 전 줄기로 돌아갑니다</li>
+            </ul>
+          </details>
         </li>
 
         <li class="cmd" data-flow="commit">
           <div class="cmd__head">
             <span class="risk risk--warn"><span aria-hidden="true">!</span> 주의</span>
-            <h3>직전 커밋 수정</h3>
+            <h3>방금 만든 버전 다시 찍기</h3>
           </div>
           <code class="cmd__code">git commit --amend</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 <code>main</code></p>
-          <p class="cmd__desc">기존 커밋을 고치는 것이 아니라 <strong>새 커밋으로 갈아끼웁니다.</strong> 해시가 바뀌므로 이미 push했다면 강제 푸시가 필요해집니다. 협업 중이라면 <code>revert</code>를 쓰세요.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함 (로컬 <code>main</code>)</p>
+          <p class="cmd__desc">기존 버전을 고치는 게 아니라 <strong>새 버전으로 갈아끼웁니다.</strong> 버전 번호(해시)가 바뀌므로 이미 올렸다면 강제로 덮어써야 합니다. 협업 중이라면 <code>revert</code>를 쓰세요.</p>
         </li>
 
         <li class="cmd" data-flow="commit">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>이미 올린 커밋 되돌리기</h3>
+            <h3>이미 보낸 버전 되돌리기</h3>
           </div>
           <code class="cmd__code">git revert &lt;해시&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 로컬 <code>main</code> (새 커밋 추가)</p>
-          <p class="cmd__desc">기록을 지우지 않고 <strong>반대 내용의 커밋을 하나 더 쌓습니다.</strong> 그래서 동료의 작업을 망치지 않습니다. 이미 push한 것은 항상 이 방법입니다.</p>
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함 (버전 하나 추가)</p>
+          <p class="cmd__desc">기록을 지우지 않고 <strong>반대 내용의 버전을 하나 더 만듭니다.</strong> 그래서 동료 작업을 망치지 않습니다.</p>
+          <details class="more">
+            <summary>옵션 풀어쓰기</summary>
+            <ul class="opts">
+              <li><code>-n</code> = <code>--no-commit</code> — 되돌리되 버전은 아직 만들지 않습니다</li>
+              <li><code>-e</code> = <code>--edit</code> — 버전 설명을 직접 씁니다</li>
+              <li><code>git log --oneline -5</code> 의 <code>-5</code> = <code>-n 5</code> = <code>--max-count=5</code> — 최근 5장만 봅니다</li>
+            </ul>
+            <div class="callout callout--inline">
+              <p><strong>버전을 가리키는 표기법</strong></p>
+              <p>
+                <code>HEAD</code> 는 지금 펼친 페이지, <code>HEAD~1</code> 은 <strong>한 장 앞</strong>,
+                <code>HEAD~2</code> 는 두 장 앞입니다. <code>HEAD^</code> 는 <code>HEAD~1</code> 과 같은 뜻이라
+                검색하면 둘 다 나옵니다. 해시 대신 이 표기를 써도 됩니다.
+              </p>
+            </div>
+          </details>
         </li>
 
         <li class="cmd" data-flow="none">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>브랜치 전환 없이 병행 작업</h3>
+            <h3>줄기를 옮기지 않고 동시에 작업하기</h3>
           </div>
           <code class="cmd__code">git worktree add &lt;경로&gt; &lt;브랜치&gt;</code>
-          <p class="cmd__area"><span class="cmd__area-label">영향 영역</span> 새 작업 폴더 생성</p>
-          <p class="cmd__desc">같은 저장소를 다른 폴더에 동시에 펼쳐놓습니다. 기능 개발 중 급한 버그 수정이 들어왔을 때, 지금 작업을 커밋하지 않고 별도 폴더에서 고칠 수 있습니다.</p>
-          <div class="code-block">
-            <pre><code>git worktree add ../프로젝트-hotfix hotfix
+          <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 새 책상(작업 폴더)이 하나 더 생김</p>
+          <p class="cmd__desc">같은 원고를 다른 폴더에 동시에 펼쳐놓습니다. 작업 중 급한 수정이 들어왔을 때 지금 것을 버전을 남겨두지 않고도 별도 폴더에서 고칠 수 있습니다.</p>
+          <details class="more">
+            <summary>사용법과 주의점</summary>
+            <div class="code">
+              <pre><code>git worktree add ../프로젝트-hotfix hotfix
 git worktree list
 git worktree remove ../프로젝트-hotfix</code></pre>
-            <button class="copy-btn" type="button" data-copy="git worktree add ../프로젝트-hotfix hotfix">복사</button>
-          </div>
-          <div class="callout callout--warn callout--inline">
-            <p><strong>같은 브랜치를 두 worktree에서 동시에 열 수 없습니다.</strong> 이 제약을 모르면 에러 메시지를 이해할 수 없습니다.</p>
-            <p><strong><code>stash</code>와의 차이</strong> — <code>stash</code>는 한 폴더 안에서 작업을 잠시 치워두는 것이고, worktree는 폴더를 하나 더 만드는 것입니다. 에디터를 두 개 띄워 비교하며 작업할 수 있습니다.</p>
-          </div>
+              <button class="copy-btn" type="button" data-copy="git worktree add ../프로젝트-hotfix hotfix">복사</button>
+            </div>
+            <div class="callout callout--warn callout--inline">
+              <p><strong>같은 줄기를 두 폴더에서 동시에 열 수 없습니다.</strong> 이 제약을 모르면 오류 메시지를 이해할 수 없습니다.</p>
+              <p><strong><code>stash</code>와의 차이</strong> — <code>stash</code>는 한 폴더 안에서 작업을 서랍에 치워두는 것이고, worktree는 폴더를 하나 더 만드는 것입니다.</p>
+            </div>
+          </details>
         </li>
       </ul>
 
-      <h3 class="sub-title">로컬과 원격 비교하기</h3>
-      <div class="code-block">
-        <pre><code>git log --oneline origin/main..main   # 내게는 있고 원격에 없는 커밋
-git log --oneline main..origin/main   # 원격에는 있고 내게 없는 커밋</code></pre>
+      <h3 class="sub-title">내 기록함과 공유 폴더 비교하기</h3>
+      <div class="code">
+        <pre><code>git log --oneline origin/main..main   # 내게는 있고 공유 폴더에 없는 버전
+git log --oneline main..origin/main   # 공유 폴더에는 있고 내게 없는 버전</code></pre>
         <button class="copy-btn" type="button" data-copy="git log --oneline origin/main..main">복사</button>
       </div>
       <div class="callout callout--warn">
         <p>
-          이 명령은 <strong>GitHub의 현재 상태가 아니라 마지막 <code>fetch</code> 결과</strong>와 비교합니다.
-          최신 상태로 비교하려면 <code>git fetch</code>를 먼저 실행하세요.
+          이 명령은 <strong>공유 폴더의 지금 상태가 아니라 내 메모(<code>origin/main</code>)</strong>와 비교합니다.
+          최신으로 비교하려면 <code>git fetch</code>를 먼저 실행하세요.
         </p>
+        <p class="note"><code>--oneline</code>, <code>--graph</code>, <code>--all</code>은 <strong>짧은 형태가 없습니다.</strong></p>
       </div>
 
-      <h3 class="sub-title">구식 / 신식 대응표</h3>
+      <h3 class="sub-title">옛날 명령어 → 지금 권장 명령어</h3>
       <p class="section__desc section__desc--sm">
         검색하면 대부분 <code>checkout</code> 기준의 옛날 답변이 나옵니다. 부정하지 말고, 같은 일을 한다는 것만 알아두세요.
       </p>
       <div class="table-scroll">
         <table class="table">
-          <caption class="sr-only">구식 명령어와 현재 권장 명령어 대응표</caption>
+          <caption class="sr-only">옛날 명령어와 현재 권장 명령어 대응표</caption>
           <thead>
             <tr><th scope="col">하고 싶은 일</th><th scope="col">권장 (현재)</th><th scope="col">검색에서 자주 보이는 방식</th></tr>
           </thead>
           <tbody>
-            <tr><td>스테이징 내용으로 파일 되돌리기</td><td><code>git restore &lt;파일&gt;</code></td><td><code>git checkout -- &lt;파일&gt;</code></td></tr>
-            <tr><td><code>add</code> 취소</td><td><code>git restore --staged &lt;파일&gt;</code></td><td><code>git reset HEAD &lt;파일&gt;</code></td></tr>
-            <tr><td>브랜치 이동</td><td><code>git switch &lt;브랜치&gt;</code></td><td><code>git checkout &lt;브랜치&gt;</code></td></tr>
-            <tr><td>브랜치 생성 후 이동</td><td><code>git switch -c &lt;브랜치&gt;</code></td><td><code>git checkout -b &lt;브랜치&gt;</code></td></tr>
-            <tr><td>직전 브랜치로 돌아가기</td><td><code>git switch -</code></td><td><code>git checkout -</code></td></tr>
+            <tr><td>고르는 자리 내용으로 파일 되돌리기</td><td><code>git restore &lt;파일&gt;</code></td><td><code>git checkout -- &lt;파일&gt;</code></td></tr>
+            <tr><td>담은 것 빼기</td><td><code>git restore --staged &lt;파일&gt;</code></td><td><code>git reset HEAD &lt;파일&gt;</code></td></tr>
+            <tr><td>줄기 옮기기</td><td><code>git switch &lt;브랜치&gt;</code></td><td><code>git checkout &lt;브랜치&gt;</code></td></tr>
+            <tr><td>줄기 만들고 옮기기</td><td><code>git switch -c &lt;브랜치&gt;</code></td><td><code>git checkout -b &lt;브랜치&gt;</code></td></tr>
+            <tr><td>바로 전 줄기로</td><td><code>git switch -</code></td><td><code>git checkout -</code></td></tr>
           </tbody>
         </table>
       </div>
       <p class="note">
-        <code>checkout</code> 하나가 “브랜치 이동”과 “파일 되돌리기”라는 전혀 다른 일을 담당했던 것이 초보자 혼란의 큰 원인이었습니다.
-        <code>switch</code>와 <code>restore</code>는 2019년 도입 후 오랫동안 실험적 상태였다가 2025년에 정식이 되었고,
-        그래서 기존 자료 대부분이 아직 <code>checkout</code> 기준으로 쓰여 있습니다.
+        <code>checkout</code> 하나가 “줄기 옮기기”와 “파일 되돌리기”라는 전혀 다른 일을 담당했던 것이 혼란의 큰 원인이었습니다.
+        <code>switch</code>와 <code>restore</code>는 2019년 도입 후 오랫동안 실험 상태였다가 2025년에 정식이 되었고,
+        그래서 기존 자료 대부분이 아직 <code>checkout</code> 기준입니다.
       </p>
+
+      <h3 class="sub-title">자주 쓰는데 사전에 없던 것들</h3>
+      <div class="table-scroll">
+        <table class="table">
+          <caption class="sr-only">같은 일을 하는 여러 표기 형태</caption>
+          <thead>
+            <tr><th scope="col">하고 싶은 일</th><th scope="col">표기 형태</th><th scope="col">알아둘 점</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>작업을 잠깐 치워두기</td>
+              <td><code>git stash</code> = <code>git stash push</code></td>
+              <td>그냥 <code>git stash</code>는 <code>push</code>를 생략한 것입니다. <code>-u</code> = <code>--include-untracked</code>를 붙여야 새 파일도 함께 치웁니다</td>
+            </tr>
+            <tr>
+              <td>치워둔 것 꺼내기</td>
+              <td><code>git stash pop</code> / <code>git stash apply</code></td>
+              <td><code>pop</code>은 꺼내면서 서랍에서 지우고, <code>apply</code>는 서랍에 그대로 둡니다</td>
+            </tr>
+            <tr>
+              <td>줄기 지우기</td>
+              <td><code>git branch -d</code> / <code>-D</code></td>
+              <td><code>-d</code> = <code>--delete</code>는 합쳐진 줄기만 지웁니다. <strong>대문자 <code>-D</code>는 확인 없이 강제로</strong> 지웁니다</td>
+            </tr>
+            <tr>
+              <td>줄기 목록 보기</td>
+              <td><code>git branch -a</code></td>
+              <td><code>-a</code> = <code>--all</code> — 공유 폴더 쪽 줄기까지 함께 봅니다</td>
+            </tr>
+            <tr>
+              <td>원고 기록을 그림으로</td>
+              <td><code>git log --oneline --graph --all</code></td>
+              <td>세 옵션 모두 <strong>짧은 형태가 없습니다</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="callout callout--tip">
         <h3><code>git reflog</code>는 어디까지 구해주나요</h3>
-        <p><code>git reflog</code>는 <strong>이동하거나 삭제된 커밋</strong>을 찾는 데 유용합니다.</p>
-        <p>다만 <strong>한 번도 커밋하지 않은 파일 변경까지 복구해주지는 않습니다.</strong></p>
-        <p>그래서 위험한 명령 전에 먼저 커밋하거나 <code>stash</code>해두는 것이 중요합니다.</p>
+        <p><code>git reflog</code>는 <strong>옮겨지거나 지워진 버전</strong>을 찾는 데 유용합니다.</p>
+        <p>다만 <strong>한 번도 버전으로 남기지 않은 수정까지 복구해주지는 않습니다.</strong></p>
+        <p>그래서 위험한 명령 전에 먼저 버전을 남겨두거나 서랍에 치워두는(<code>stash</code>) 것이 중요합니다.</p>
       </div>
     </div>
   </section>
 
-  <!-- ============================ 5. 자주 하는 실수 ============================ -->
-  <section id="mistakes" class="section section--alt" aria-labelledby="mistakes-title">
-    <div class="wrap">
-      <h2 id="mistakes-title" class="section__title">자주 하는 실수</h2>
-      <p class="section__desc">
-        이 서비스를 만들면서 제작자가 실제로 겪은 사고 기록입니다.
-        검색해도 잘 안 나오는 것들이라 남겨둡니다.
-      </p>
-
-      <ol class="mistakes">
-        <li class="mistake">
-          <h3>1. <code>.env</code>를 커밋해버렸다</h3>
-          <p class="mistake__what">
-            <code>.gitignore</code>를 만들기 전에 <code>git add .</code>를 먼저 했다. API 키가 들어 있는 파일이 그대로 올라갔다.
-          </p>
-          <p class="mistake__fix">
-            <strong>배운 것</strong> — 순서가 중요하다. <strong>먼저 AI Studio에서 키를 폐기·재발급하고, 그다음 커밋 이력을 정리한다.</strong>
-            반대로 하면 정리하는 동안에도 유출된 키가 살아 있다.
-            그리고 <code>git rm --cached .env</code>는 <strong>앞으로의 커밋</strong>에서만 빼줄 뿐, 이미 올라간 과거 커밋에는 그대로 남는다.
-          </p>
-        </li>
-
-        <li class="mistake">
-          <h3>2. 첫 push에서 upstream 에러</h3>
-          <p class="mistake__what">
-            <code>fatal: The current branch main has no upstream branch</code>.
-            브랜치는 있는데 “어느 원격의 어느 브랜치에 올릴지”를 정해준 적이 없어서 생기는 에러였다.
-          </p>
-          <p class="mistake__fix">
-            <strong>배운 것</strong> — <code>git push -u origin main</code>으로 한 번 연결하거나,
-            <code>git config --global push.autoSetupRemote true</code>를 한 번만 설정하면 다시는 만나지 않는다.
-          </p>
-        </li>
-
-        <li class="mistake">
-          <h3>3. <code>git add</code> 후 <code>git restore</code>를 했는데 아무 일도 안 일어났다</h3>
-          <p class="mistake__what">
-            수정을 되돌리려고 <code>git restore app.js</code>를 실행했는데 파일이 그대로였다.
-            버그인 줄 알았지만 아니었다.
-          </p>
-          <p class="mistake__fix">
-            <strong>배운 것</strong> — <code>restore</code>의 기본 소스는 <code>HEAD</code>가 아니라 <strong>index</strong>다.
-            이미 <code>add</code>해둔 내용을 다시 덮어쓴 것이라 “그대로”로 보였다.
-            마지막 커밋 상태로 돌리려면 <code>git restore --source=HEAD -- app.js</code>.
-            이 사고 때문에 기획서의 영향 영역 표를 전부 다시 검토했다.
-          </p>
-        </li>
-
-        <li class="mistake">
-          <h3>4. 로컬에서는 되는데 배포하면 안 된다</h3>
-          <p class="mistake__what">
-            로컬에서는 AI 응답이 잘 왔는데 배포본에서는 500이 떴다. <code>.env</code>는 <code>.gitignore</code>에 있으니
-            <strong>배포 서버에는 애초에 존재하지 않는다</strong>는 것을 잊고 있었다.
-          </p>
-          <p class="mistake__fix">
-            <strong>배운 것</strong> — Vercel의 Environment Variables에 키를 따로 넣어야 한다.
-            재미있게도 이건 이 서비스가 설명하는 문제와 같은 구조다.
-            <strong>“내 컴퓨터에 있는 것”과 “서버에 있는 것”은 다르다.</strong>
-            <code>commit</code>이 GitHub에 아무것도 보내지 않는 것과 똑같은 이야기다.
-          </p>
-        </li>
-
-        <li class="mistake">
-          <h3>5. <code>fetch</code>했는데 파일이 안 바뀌어서 또 <code>fetch</code>했다</h3>
-          <p class="mistake__what">
-            동료가 push했다길래 <code>git fetch</code>를 했는데 내 파일이 그대로였다. 몇 번을 더 했다.
-          </p>
-          <p class="mistake__fix">
-            <strong>배운 것</strong> — <code>fetch</code>는 커밋을 받아와 <code>origin/main</code>을 갱신할 뿐,
-            로컬 <code>main</code>과 작업 폴더에는 합치지 않는다. 합치려면 <code>git merge origin/main</code>이 필요하고,
-            <code>git pull</code>은 이 둘을 한 번에 하는 것이다. 이 경험이 5영역 모델을 만든 이유다.
-          </p>
-        </li>
-      </ol>
-    </div>
-  </section>
 </main>
 
 <footer class="footer">
   <div class="wrap footer__inner">
     <div>
       <p class="footer__brand">🛟 커밋구조대</p>
-      <p>Git 사고를 자연어로 설명하면, 수습 명령어와 그 명령이 바꾸는 영역을 함께 보여주는 서비스입니다.</p>
+      <p>Git을 원고 교정에 비유해 그림으로 보여주고, 사고가 났을 때 수습 명령어와 그 명령이 바꾸는 칸을 함께 알려주는 서비스입니다.</p>
     </div>
     <div class="footer__meta">
-      <p><strong>참고 문헌</strong> — Git 개념은 Pro Git 2판(Scott Chacon, Ben Straub, CC BY-NC-SA 3.0)과 Git 공식 문서 <code>git-scm.com/docs</code>를 참고했습니다. 본문과 그림은 모두 새로 작성했습니다.</p>
+      <p><strong>참고 문헌</strong> — Git 개념은 Pro Git 2판(Scott Chacon, Ben Straub, CC BY-NC-SA 3.0)과 Git 공식 문서 <code>git-scm.com/docs</code>를 참고했습니다. 본문과 그림, 비유는 모두 새로 작성했습니다.</p>
       <p><strong>데이터 취급</strong> — 입력 내용은 서버에 저장하지 않습니다(무상태). 다만 AI는 Google Gemini 무료 등급을 사용하며, 무료 등급에 보낸 입력과 출력은 모델 개선에 사용될 수 있습니다. 비밀번호·API 키·토큰은 입력하지 마세요.</p>
       <p><strong>지원 범위</strong> — 이 서비스는 실제 저장소를 읽지 않습니다. 화면의 그래프는 모두 개념 예시이며, 답변에는 확인된 사실과 추정이 구분되어 표시됩니다.</p>
     </div>
