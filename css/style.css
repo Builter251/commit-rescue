@@ -245,31 +245,48 @@ code {
 }
 .note { color: var(--fg-muted); font-size: .9rem; max-width: 70ch; }
 
-/* ----------------------------------- 히어로 ---------------------------------- */
-.section--hero { padding-top: 56px; }
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 14px; border-radius: 999px;
-  background: var(--accent-soft); color: var(--accent-strong);
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  font-size: .87rem; font-weight: 700; margin-bottom: 22px;
+/* ------------------------- 한눈에 보기 (시각화 무대) ------------------------- */
+/* 한 화면 안에서 제목 → 알약 버튼 → 그림이 모두 보이도록 높이를 배분한다.
+   그림이 이 서비스의 주인공이므로, 남는 높이는 전부 그림에 준다. */
+.section--stage {
+  padding: 14px 0 22px;
+  border-bottom: 1px solid var(--border);
 }
-.badge code { background: transparent; border: 0; padding: 0; font-weight: 700; }
+.stage { display: flex; flex-direction: column; gap: 10px; }
 
-.hero__title {
-  font-size: clamp(2rem, 5.2vw, 3.1rem);
-  font-weight: 800; letter-spacing: -.03em; margin-bottom: 18px;
+.stage__head { text-align: center; }
+.stage__title {
+  font-size: clamp(1.25rem, 2.3vw, 1.7rem);
+  font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px;
+  line-height: 1.3;
 }
-.hero__title em { font-style: normal; color: var(--accent); }
-.hero__lead { font-size: 1.1rem; color: var(--fg-muted); max-width: 56ch; }
-.hero__lead strong { color: var(--fg); }
+.stage__title em { font-style: normal; color: var(--accent); }
+.stage__lead {
+  font-size: .9rem; color: var(--fg-muted);
+  max-width: 60ch; margin: 0 auto;
+}
+.stage__lead strong { color: var(--fg); }
 
-.hero__actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 40px; }
+/* 알약 버튼 — 그림 위에 둔다 */
+.stage__picker {
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 9px 12px;
+}
+.stage__picker-label {
+  font-size: .75rem; font-weight: 800; letter-spacing: .03em;
+  color: var(--fg-faint); margin: 0 0 6px; text-align: center;
+}
+.stage__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+.pill__ko {
+  display: block; font-family: var(--font);
+  font-size: .72rem; font-weight: 700; opacity: .75; margin-top: 1px;
+}
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 12px 22px; border-radius: 999px;
-  font: inherit; font-weight: 700; font-size: .95rem;
+  padding: 11px 20px; border-radius: 999px;
+  font: inherit; font-weight: 700; font-size: .93rem;
   text-decoration: none; cursor: pointer;
   border: 1px solid transparent; transition: transform .12s, background .15s;
 }
@@ -280,54 +297,6 @@ code {
 .btn--ghost:hover { background: var(--bg-alt); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-
-/* 사용 예시 */
-.example {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
-}
-.example__title { font-size: 1rem; font-weight: 800; margin-bottom: 16px; color: var(--fg-muted); }
-.example__grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.4fr); gap: 18px; align-items: center; }
-.example__arrow { font-size: 1.5rem; color: var(--fg-faint); }
-.example__label {
-  display: inline-block; font-size: .74rem; font-weight: 800;
-  letter-spacing: .06em; color: var(--fg-faint); margin-bottom: 6px;
-}
-.example__in p { font-size: 1.02rem; font-weight: 600; margin: 0; }
-.example__steps { list-style: none; counter-reset: s; display: grid; gap: 8px; }
-.example__steps li {
-  counter-increment: s;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-  font-size: .9rem; padding-left: 26px; position: relative;
-}
-.example__steps li::before {
-  content: counter(s);
-  position: absolute; left: 0; top: 2px;
-  width: 19px; height: 19px; border-radius: 50%;
-  background: var(--accent-soft); color: var(--accent-strong);
-  font-size: .72rem; font-weight: 800;
-  display: grid; place-items: center;
-}
-
-/* 그리드 항목이 min-content 아래로 줄어들 수 있게 한다.
-   이걸 빼면 좁은 화면에서 칸이 콘텐츠 폭만큼 벌어져 페이지가 가로로 밀린다. */
-.hero__values > li,
-.preset-grid > *,
-.cmd-list > li,
-.result__cols > *,
-.footer__inner > *,
-.example__grid > * { min-width: 0; }
-
-.hero__values {
-  list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px; margin-top: 28px;
-}
-.hero__values li {
-  padding: 16px 18px; border-radius: var(--radius-sm);
-  background: var(--bg-alt); border: 1px solid var(--border);
-}
-.hero__values strong { display: block; margin-bottom: 4px; }
-.hero__values span { font-size: .9rem; color: var(--fg-muted); }
 
 /* 칩 */
 .chip {
@@ -362,9 +331,21 @@ code {
 
 .diagram-wrap {
   background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+  border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow);
+  display: flex; justify-content: center;
+  min-height: 0;              /* flex 자식이 줄어들 수 있게 */
+  width: 100%; max-width: 780px; margin: 0 auto;   /* 그림 주변 빈 공간을 줄인다 */
 }
-.areas { display: block; width: 100%; height: auto; }
+
+/* 그림이 한 화면 안에 들어오도록 높이를 제한한다.
+   viewBox + preserveAspectRatio 덕분에 잘리지 않고 비율 그대로 줄어든다.
+   계산식: 화면 높이 − 네비 − 제목/알약/설명/버튼/여백 몫 */
+.areas {
+  display: block;
+  width: 100%; height: auto;
+  max-height: calc(100dvh - var(--nav-h) - 320px);
+  min-height: 300px;
+}
 
 .areas__container rect {
   fill: none; stroke: var(--svg-container);
@@ -410,7 +391,7 @@ code {
 
 .diagram-caption { margin-top: 14px; color: var(--fg-muted); font-size: .93rem; }
 
-.flow-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px; }
+.flow-buttons { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; justify-content: center; }
 .pill {
   padding: 7px 13px; border-radius: 999px;
   border: 1px solid var(--border-strong); background: var(--bg-card);
@@ -421,58 +402,107 @@ code {
 .pill.is-active { background: var(--accent); color: #fff; border-color: var(--accent); }
 [data-theme="dark"] .pill.is-active { color: #06211f; }
 .pill--reset { font-family: var(--font); }
-.flow-desc { color: var(--fg-muted); font-size: .9rem; min-height: 1.7em; }
+.flow-desc { color: var(--fg-muted); font-size: .86rem; min-height: 1.6em; margin: 0; text-align: center; }
 
 /* 네 가지 사실 */
-.facts { list-style: none; counter-reset: f; display: grid; gap: 12px; }
-.facts li {
-  counter-increment: f; position: relative;
-  padding: 16px 18px 16px 56px;
+/* ------------------------------- 쉬운 말 사전 ------------------------------- */
+/* 쉬운 말을 크게, 원래 용어를 그 아래 나란히. 검색은 원래 용어로 해야 하니 둘 다 보여준다. */
+.words {
+  list-style: none;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;
+}
+.word {
+  min-width: 0;
+  padding: 15px 17px;
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
-.facts li::before {
-  content: counter(f);
-  position: absolute; left: 18px; top: 16px;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  font-weight: 800; font-size: .85rem;
-  display: grid; place-items: center;
+.word__easy {
+  font-size: 1.02rem; font-weight: 800; margin: 0 0 4px;
 }
-[data-theme="dark"] .facts li::before { color: #06211f; }
-.facts strong { display: block; margin-bottom: 3px; }
-.facts span { color: var(--fg-muted); font-size: .93rem; }
+.word__easy::before { content: "“"; color: var(--accent); }
+.word__easy::after { content: "”"; color: var(--accent); }
+.word__real { margin: 0 0 8px; }
+.word__real code {
+  background: var(--accent-soft); color: var(--accent-strong);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  font-size: .8rem; font-weight: 700;
+}
+.word__desc { margin: 0; font-size: .9rem; color: var(--fg-muted); }
+.word__desc em { font-style: normal; font-weight: 700; color: var(--fg); }
+.word--key { border-color: var(--accent); border-width: 2px; padding: 14px 16px; }
+
+/* ---------------------------- 접기 (높이 절약) ----------------------------
+   한 덩어리가 화면 높이를 넘지 않게 하는 것이 목적이다.
+   자세한 설명·옵션·긴 예시는 기본으로 접어두고 필요할 때만 편다. */
+.more {
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-inset); margin-top: 12px;
+}
+.more > summary {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  padding: 10px 13px; cursor: pointer; list-style: none;
+  font-size: .87rem; font-weight: 700; color: var(--fg-muted);
+}
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::before {
+  content: "▸"; color: var(--accent); font-weight: 800; flex: none;
+}
+.more[open] > summary::before { content: "▾"; }
+.more > summary:hover { color: var(--fg); }
+.more > *:not(summary) { padding: 0 13px 13px; }
+.more .callout--inline,
+.more .code { margin-left: 13px; margin-right: 13px; padding-left: 0; padding-right: 0; }
+
+.opts { list-style: none; display: grid; gap: 6px; font-size: .87rem; }
+.opts li { padding-left: 14px; position: relative; color: var(--fg-muted); }
+.opts li::before { content: "·"; position: absolute; left: 3px; font-weight: 800; }
+.opts strong { color: var(--fg); }
+.opts code { font-size: .84rem; }
 
 /* --------------------------------- 콜아웃 / 코드 -------------------------------- */
 .callout {
-  border-radius: var(--radius-sm); padding: 18px 20px;
+  border-radius: var(--radius-sm); padding: 16px 18px;
   border: 1px solid var(--border); background: var(--bg-card);
-  border-left: 4px solid var(--accent); margin: 22px 0;
+  border-left: 4px solid var(--accent); margin: 18px 0;
 }
-.callout h3 { font-size: 1rem; margin-bottom: 10px; }
+.callout h3 { font-size: 1rem; margin-bottom: 8px; }
 .callout p:last-child { margin-bottom: 0; }
 .callout--warn { border-left-color: var(--risk-warn-fg); background: var(--risk-warn-bg); }
 .callout--warn code { background: color-mix(in srgb, var(--bg) 55%, transparent); }
 .callout--danger { border-left-color: var(--risk-danger-fg); background: var(--risk-danger-bg); }
-.callout--inline { margin: 12px 0 0; padding: 13px 15px; font-size: .9rem; }
+.callout--inline { margin: 10px 0 0; padding: 12px 14px; font-size: .9rem; }
 
-.code-block { position: relative; margin: 12px 0; }
-.code-block pre {
-  margin: 0; padding: 16px 82px 16px 16px;
+/* 코드 + 복사 버튼 — 화면 어디에 나오든 같은 규칙을 쓴다.
+   예전에는 code-block(절대 위치 우상단)과 결과 단계(인라인 옆자리)가
+   서로 다른 여백을 써서 들쭉날쭉했다. 이제 하나로 통일한다.
+     · 코드는 항상 오른쪽에 버튼 자리(--copy-gutter)를 비워둔다
+     · 버튼은 항상 우상단 같은 좌표에 붙는다 */
+.code {
+  --copy-gutter: 74px;
+  position: relative;
+  margin: 10px 0;
+}
+.code pre,
+.code > code {
+  display: block; margin: 0;
+  padding: 12px var(--copy-gutter) 12px 14px;
   background: var(--bg-code); border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  overflow-x: auto; font-size: .87rem; line-height: 1.65;
+  overflow-x: auto;
+  font-family: var(--mono); font-size: .87rem; line-height: 1.6;
+  min-height: 44px;
 }
-.code-block pre code { background: none; border: 0; padding: 0; }
-.copy-btn {
-  position: absolute; top: 10px; right: 10px;
+.code pre code { background: none; border: 0; padding: 0; font-size: 1em; }
+.code .copy-btn {
+  position: absolute; top: 8px; right: 8px;
   padding: 5px 11px; border-radius: 7px;
   border: 1px solid var(--border-strong); background: var(--bg-card);
   color: var(--fg-muted); font: inherit; font-size: .78rem; font-weight: 700;
-  cursor: pointer;
+  cursor: pointer; line-height: 1.4;
 }
-.copy-btn:hover { color: var(--fg); border-color: var(--accent); }
-.copy-btn:disabled { opacity: .5; cursor: not-allowed; }
+.code .copy-btn:hover { color: var(--fg); border-color: var(--accent); }
+.code .copy-btn:disabled { opacity: .45; cursor: not-allowed; }
 
 /* --------------------------------- 정적 카드 --------------------------------- */
 .preset-grid {
@@ -605,8 +635,8 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .result__where { font-size: .74rem; font-weight: 700; color: var(--fg-muted); border: 1px solid var(--border-strong); padding: 3px 10px; border-radius: 999px; }
 .result__summary { font-size: 1.15rem; font-weight: 700; margin: 0; }
 
-.result__body { padding: 24px; display: grid; gap: 26px; }
-.result__cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 26px; align-items: start; }
+.result__body { padding: 20px; display: grid; gap: 18px; }
+.result__cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 20px; align-items: start; }
 
 .block__title {
   font-size: .82rem; font-weight: 800; letter-spacing: .04em;
@@ -633,11 +663,11 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .evidence__cta { font-size: .82rem; color: var(--fg-muted); margin: 8px 0 0; }
 
 /* 명령어 단계 */
-.steps { list-style: none; counter-reset: st; display: grid; gap: 12px; }
+.steps { list-style: none; counter-reset: st; display: grid; gap: 9px; }
 .step {
   counter-increment: st; position: relative;
   border: 1px solid var(--border); border-radius: var(--radius-sm);
-  padding: 14px 16px 14px 52px; background: var(--bg-inset);
+  padding: 12px 14px 12px 48px; background: var(--bg-inset);
 }
 .step::before {
   content: counter(st);
@@ -647,12 +677,8 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   font-size: .8rem; font-weight: 800; display: grid; place-items: center;
 }
 [data-theme="dark"] .step::before { color: #06211f; }
-.step__cmd { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-.step__cmd code {
-  flex: 1; background: var(--bg-code); border: 1px solid var(--border);
-  padding: 8px 11px; border-radius: 7px; font-size: .88rem;
-  user-select: all; -webkit-user-select: all;
-}
+.step > .code { margin: 0 0 8px; }
+.step > .code > code { user-select: all; -webkit-user-select: all; }
 .step__desc { font-size: .92rem; color: var(--fg-muted); margin: 0 0 8px; }
 .step__areas { display: flex; flex-wrap: wrap; gap: 6px; }
 
@@ -730,8 +756,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .gate__step.is-done::before { content: "✓"; background: var(--risk-safe-fg); color: #fff; }
 .gate__step label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: .91rem; font-weight: 700; }
 .gate__step input[type="checkbox"] { margin-top: 3px; width: 17px; height: 17px; accent-color: var(--risk-safe-fg); flex: none; }
-.gate__step .code-block { margin: 8px 0 0; }
-.gate__step .code-block pre { padding: 10px 76px 10px 12px; font-size: .82rem; }
+.gate__step .code { margin: 8px 0 0; }
 .gate__loss { margin-top: 10px; font-size: .88rem; }
 .gate__loss h5 { margin: 0 0 4px; font-size: .84rem; font-weight: 800; }
 .gate__loss ul { list-style: none; display: grid; gap: 3px; margin-bottom: 8px; }
@@ -744,7 +769,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   background: none; border: 0; text-decoration: underline; cursor: pointer;
   font-family: inherit; padding: 0;
 }
-.is-locked .step__cmd code { opacity: .55; }
+.is-locked .step > .code > code { opacity: .55; }
 .is-locked .copy-btn { pointer-events: none; opacity: .45; }
 
 /* 재시도 / 오류 */
@@ -770,7 +795,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .cmd__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .cmd__head h3 { font-size: 1.02rem; font-weight: 800; }
 .cmd__code {
-  display: block; padding: 9px 12px; margin-bottom: 10px;
+  display: block; padding: 12px 14px; margin-bottom: 10px;
   background: var(--bg-code); border: 1px solid var(--border); border-radius: 7px;
   font-size: .88rem; user-select: all; -webkit-user-select: all;
 }
@@ -799,20 +824,6 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .table th, .table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); }
 .table thead th { background: var(--bg-inset); font-weight: 800; font-size: .84rem; }
 .table tbody tr:last-child td { border-bottom: 0; }
-
-/* -------------------------------- 자주 하는 실수 -------------------------------- */
-.mistakes { list-style: none; display: grid; gap: 14px; }
-.mistake {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 20px 22px;
-}
-.mistake h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 10px; }
-.mistake__what { color: var(--fg-muted); font-size: .93rem; }
-.mistake__fix {
-  font-size: .93rem; margin: 0; padding: 13px 15px;
-  background: var(--bg-inset); border-left: 3px solid var(--accent);
-  border-radius: 0 8px 8px 0;
-}
 
 /* ---------------------------------- 푸터 ---------------------------------- */
 .footer { background: var(--bg-alt); padding: 44px 0 60px; }
@@ -846,3 +857,36 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   .risk { border-width: 2px !important; }
   .section { break-inside: avoid; }
 }
+
+/* ==========================================================================
+   한 덩어리가 화면 높이를 넘지 않게 하는 규칙 (사용자 피드백 반영)
+   원칙: 스크롤은 페이지가 하고, 개별 카드/패널은 한눈에 들어오게 둔다.
+   ========================================================================== */
+
+/* 무대 섹션은 첫 화면에 제목·버튼·그림이 함께 들어오도록 높이를 나눠 쓴다 */
+.section--stage .wrap { min-height: 0; }
+
+/* 결과 패널 안의 긴 덩어리 — 넘치면 그 덩어리만 스크롤한다 */
+.evidence__group ul { max-height: 30dvh; overflow-y: auto; }
+.gate__steps { max-height: 62dvh; overflow-y: auto; padding-right: 4px; }
+.graph-box { max-height: 66dvh; overflow-y: auto; }
+.mini-areas { max-height: 46dvh; overflow-y: auto; }
+
+/* 명령어 사전 카드: 본문은 짧게, 나머지는 .more 안으로 접힌다 */
+.cmd { max-height: none; }
+.cmd .more > *:not(summary) { max-height: 44dvh; overflow-y: auto; }
+
+/* 쉬운 말 사전 카드 */
+.word { max-height: 40dvh; overflow-y: auto; }
+
+/* 폼 안내 문구가 화면을 밀지 않도록 */
+.optional__body { max-height: 56dvh; overflow-y: auto; }
+
+/* 라디오 legend 안의 원래 용어 병기 */
+.legend__real { font-weight: 500; color: var(--fg-faint); font-size: .85em; }
+
+/* 스크롤이 생기는 덩어리에 힌트를 준다 */
+.evidence__group ul,
+.gate__steps,
+.graph-box,
+.optional__body { scrollbar-width: thin; overscroll-behavior: contain; }

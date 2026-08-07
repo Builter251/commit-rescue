@@ -8,7 +8,6 @@
 @media (max-width: 1023px) {
   .result__cols { grid-template-columns: minmax(0, 1fr); }
   .preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .hero__values { grid-template-columns: minmax(0, 1fr); }
   .footer__inner { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -46,16 +45,39 @@
   .theme-toggle { margin: 10px 0 0; justify-content: center; }
   .theme-toggle__text { display: inline; }
 
-  /* 히어로 */
-  .hero__lead { font-size: 1rem; }
-  .hero__actions .btn { flex: 1 1 100%; }
-  .example { padding: 18px; }
-  .example__grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .example__arrow { transform: rotate(90deg); text-align: center; }
+  /* 무대 — 좁은 화면에서는 여백을 줄이고 그림에 높이를 더 준다 */
+  .section--stage { padding: 16px 0 32px; }
+  .stage { gap: 10px; }
+  .stage__picker { padding: 10px; }
+  .stage__picker-label { font-size: .74rem; }
+  .stage__actions .btn { flex: 1 1 100%; }
+  .pill { font-size: .76rem; padding: 6px 10px; }
+  .pill__ko { font-size: .68rem; }
 
-  /* 다이어그램 — 세로 배치라 폭은 그대로 두고, 경계 범례를 sticky로 노출 */
+  /* 다이어그램 — 좁은 화면에서는 폭에 맞춰 줄이면 글자가 8px까지 작아져 읽을 수 없다.
+     그래서 억지로 줄이지 않고 최소 폭을 보장한 뒤 그림만 가로로 넘긴다.
+     대신 "내 컴퓨터 / GitHub" 경계는 sticky 범례로 항상 보이게 유지한다 (기획서 8.1절의 취지). */
   .boundary-legend { display: flex; }
-  .diagram-wrap { padding: 10px; }
+  .diagram-wrap {
+    padding: 8px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+  .areas {
+    min-width: 560px;                  /* 이 폭 아래로는 라벨이 읽히지 않는다 */
+    max-height: calc(100dvh - var(--nav-h) - 300px);
+    min-height: 280px;
+  }
+  /* 축소된 만큼 글자를 키워 가독성을 맞춘다 (viewBox 단위) */
+  .area__name { font-size: 17px; }
+  .area__name--sm { font-size: 15px; }
+  .area__sub { font-size: 14px; }
+  .flow__label { font-size: 13.5px; }
+  .areas__container-label { font-size: 16px; }
+  .areas__net text { font-size: 13.5px; }
+
+  /* 쉬운 말 사전 */
+  .words { grid-template-columns: minmax(0, 1fr); }
 
   /* 카드 */
   .preset-grid { grid-template-columns: minmax(0, 1fr); }
@@ -81,7 +103,7 @@
   .gate { padding: 15px 14px; }
   .gate__step { padding: 11px 12px 11px 42px; }
 
-  .mistake { padding: 16px; }
+
   .footer { padding: 32px 0 44px; }
 }
 
@@ -89,12 +111,12 @@
 @media (max-width: 380px) {
   .nav__brand span:last-child { font-size: .95rem; }
   .badge { font-size: .8rem; }
-  .hero__title { font-size: 1.75rem; }
+  .stage__title { font-size: 1.2rem; }
 }
 
 /* --------------------------- 데스크톱 (1024px~) --------------------------- */
 @media (min-width: 1024px) {
   .theme-toggle__text { display: inline; }
-  .diagram-wrap { padding: 24px 32px; }
-  .areas { max-width: 720px; margin: 0 auto; }
+  .diagram-wrap { padding: 14px 20px; }
+  .areas { max-width: 700px; }
 }
