@@ -95,10 +95,10 @@ commit-rescue/
 │   ├── graph.js                  V2 렌더러
 │   └── areas.js                  V1 5영역 다이어그램 제어 + 미니 영역 표시
 ├── api/
-│   └── rescue.py                 Gemini 호출, 입력 검증, 응답 정규화
-├── requirements.txt
+│   ├── rescue.py                 Gemini 호출, 입력 검증, 응답 정규화
+│   └── requirements.txt          루트에 두면 Vercel이 Python 앱으로 오인합니다
 ├── vercel.json
-├── .env.example
+├── .vercelignore
 └── README.md
 ```
 
@@ -118,7 +118,7 @@ python3 -m http.server 3000
 
 ```bash
 npm i -g vercel
-cp .env.example .env    # GEMINI_API_KEY 채우기
+echo "GEMINI_API_KEY=발급받은_키" > .env    # .env 는 .gitignore 에 있습니다
 vercel dev
 ```
 
@@ -138,7 +138,7 @@ vercel --prod
 | 이름 | 필수 | 설명 |
 |---|:---:|---|
 | `GEMINI_API_KEY` | O | Google AI Studio에서 발급받은 키. 서버리스 함수 안에서만 `os.environ`으로 읽습니다 |
-| `GEMINI_MODEL` | X | 사용할 모델. 기본값 `gemini-2.5-flash` |
+| `GEMINI_MODEL` | X | 사용할 모델. 기본값 `gemini-3.5-flash`. 모델이 은퇴하면 404가 나므로, 그때는 이 변수로 교체합니다 |
 
 키는 프론트엔드 코드나 네트워크 응답에 절대 포함되지 않습니다.
 **유출이 의심되면 먼저 AI Studio에서 폐기·재발급하고, 그다음 커밋 이력을 정리하세요.**

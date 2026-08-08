@@ -19,7 +19,16 @@ from http.server import BaseHTTPRequestHandler
 GEMINI_ENDPOINT = (
     "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 )
-DEFAULT_MODEL = "gemini-2.5-flash"   # 무료 등급 한도가 가장 여유로운 Flash 계열 (기획서 5.1절)
+# 무료 등급 한도가 가장 여유로운 Flash 계열 (기획서 5.1절).
+#
+# 모델은 조용히 은퇴한다. 처음에 gemini-2.5-flash 로 고정했더니 배포 후
+# "This model is no longer available to new users" 404 가 떴다.
+# 그때 원인을 못 찾은 이유는 서버가 상류 오류를 감추기만 하고 로그를 남기지
+# 않아서였다. 지금은 502가 나면 상태 코드와 본문을 런타임 로그에 남기고,
+# 404면 쓸 수 있는 모델 목록까지 함께 찍는다 (_log_upstream_error 참고).
+#
+# 버전을 바꾸려면 코드를 고치지 말고 GEMINI_MODEL 환경 변수로 덮어쓴다.
+DEFAULT_MODEL = "gemini-3.5-flash"
 REQUEST_TIMEOUT = 18                 # 프론트 타임아웃(20초)보다 짧게 둔다
 
 MAX_SITUATION = 1000
@@ -317,6 +326,86 @@ class UpstreamError(Exception):
         self.retry_after = retry_after
 
 
+def _safe_read(exc):
+    """HTTPError 본문을 안전하게 읽는다. 읽지 못해도 예외를 던지지 않는다."""
+    try:
+        return exc.read().decode("utf-8", "replace")[:500]
+    except Exception:
+        return "(본문을 읽지 못함)"
+
+
+def _log_upstream_error(status, body, model):
+    """Vercel 런타임 로그로만 나간다. 사용자 응답에는 절대 포함하지 않는다."""
+    key = os.environ.get("GEMINI_API_KEY") or ""
+    if key:
+        body = body.replace(key, "***")   # 혹시라도 본문에 키가 반향되면 가린다
+    print("[gemini] status=%s model=%s body=%s" % (status, model, body), flush=True)
+    if status == 404:
+        print("[gemini] 사용 가능한 모델: %s" % _list_models(), flush=True)
+
+
+def _list_models():
+    """404(모델 없음)일 때만 호출한다. 이 키로 쓸 수 있는 모델 이름을 로그에 남긴다."""
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return "(키 없음)"
+    try:
+        req = urllib.request.Request(
+            "https://generativelanguage.googleapis.com/v1beta/models?pageSize=200",
+            headers={"x-goog-api-key": key},
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        names = [
+            m.get("name", "").replace("models/", "")
+            for m in data.get("models", [])
+            if "generateContent" in (m.get("supportedGenerationMethods") or [])
+        ]
+        return ", ".join(sorted(names)) or "(없음)"
+    except Exception as exc:
+        return "조회 실패: %r" % (exc,)
+
+
+def _extract_text(parsed):
+    """응답에서 진짜 답변 텍스트만 꺼낸다.
+
+    parts[0] 을 그대로 쓰면 안 된다. Gemini 3 계열은 사고 과정(thought) 파트를
+    먼저 넣기 때문에, 첫 파트를 집으면 JSON이 아닌 것을 파싱하게 된다.
+    """
+    candidates = parsed.get("candidates") or []
+    if not candidates:
+        raise ValueError("candidates 없음: %s" % json.dumps(parsed, ensure_ascii=False)[:300])
+
+    first = candidates[0]
+    parts = (first.get("content") or {}).get("parts") or []
+    for part in parts:
+        if part.get("thought"):        # 사고 과정 파트는 건너뛴다
+            continue
+        text = part.get("text")
+        if isinstance(text, str) and text.strip():
+            return text
+
+    raise ValueError(
+        "본문 파트 없음 (finishReason=%s, parts=%d)"
+        % (first.get("finishReason"), len(parts))
+    )
+
+
+def _log_parse_error(raw, exc, model):
+    """응답 형식이 어긋났을 때만 로그를 남긴다. 사용자 응답에는 포함하지 않는다."""
+    key = os.environ.get("GEMINI_API_KEY") or ""
+    snippet = raw if isinstance(raw, str) else str(raw)
+    if key:
+        snippet = snippet.replace(key, "***")
+    finish = "?"
+    try:
+        finish = (json.loads(snippet).get("candidates") or [{}])[0].get("finishReason", "?")
+    except Exception:
+        pass
+    print("[gemini] parse_error model=%s finishReason=%s reason=%r raw=%s"
+          % (model, finish, exc, snippet[:700]), flush=True)
+
+
 def call_gemini(user_prompt):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -333,7 +422,12 @@ def call_gemini(user_prompt):
         "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
         "generationConfig": {
             "temperature": 0.2,
-            "maxOutputTokens": 2048,
+            # 2048로는 모자란다. Gemini 3 계열은 사고(thinking) 토큰이 출력 예산을
+            # 같이 깎아서, JSON이 완성되기 전에 잘리고 파싱이 실패한다.
+            "maxOutputTokens": 8192,
+            # 이 작업은 정해진 스키마를 채우는 일이라 긴 사고가 필요 없다.
+            # 사고를 끄면 예산도 아끼고 응답도 빨라진다 (타임아웃 20초 안에 들어와야 한다).
+            "thinkingConfig": {"thinkingBudget": 0},
             "responseMimeType": "application/json",
             "responseSchema": RESPONSE_SCHEMA,
         },
@@ -353,18 +447,22 @@ def call_gemini(user_prompt):
         with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT) as response:
             raw = response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
+        # 사용자에게는 원인을 감추되, 서버 로그에는 남긴다.
+        # 로그가 없으면 502가 떴을 때 키 문제인지 모델명 문제인지 스키마 문제인지
+        # 구분할 방법이 전혀 없다. API 키는 절대 로그에 남기지 않는다.
+        _log_upstream_error(exc.code, _safe_read(exc), model)
         if exc.code == 429:
             raise UpstreamError(429, "RATE_LIMITED", "지금 이용자가 많습니다.", retry_after=30)
         # 상류의 오류 코드와 본문을 그대로 전달하지 않는다
         raise UpstreamError(502, "UPSTREAM_ERROR", "일시적인 문제가 발생했습니다.")
-    except Exception:
+    except Exception as exc:
+        _log_upstream_error("network", repr(exc)[:300], model)
         raise UpstreamError(502, "UPSTREAM_ERROR", "일시적인 문제가 발생했습니다.")
 
     try:
-        parsed = json.loads(raw)
-        text = parsed["candidates"][0]["content"]["parts"][0]["text"]
-        return json.loads(text)
-    except Exception:
+        return json.loads(_extract_text(json.loads(raw)))
+    except Exception as exc:
+        _log_parse_error(raw, exc, model)
         raise UpstreamError(502, "BAD_FORMAT", "결과를 불러오지 못했습니다.")
 
 
