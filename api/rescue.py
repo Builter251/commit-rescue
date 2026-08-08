@@ -47,6 +47,9 @@ ALLOWED_RISK = {"안전", "주의", "위험"}
 ALLOWED_WHERE = {"local", "저장소관계", "네트워크인증", "github정책", "판단불가"}
 
 SECRET_PATTERNS = [
+    # github_pat_ 는 gh[pousr]_ 에 걸리지 않는다. GitHub이 fine-grained 토큰을
+    # 기본으로 밀고 있어 이 형태가 더 흔해질 것이므로 따로 잡는다.
+    re.compile(r"github_pat_[A-Za-z0-9_]{20,}"),
     re.compile(r"gh[pousr]_[A-Za-z0-9]{16,}"),
     re.compile(r"\bsk-[A-Za-z0-9_\-]{16,}"),
     re.compile(r"AIza[0-9A-Za-z_\-]{20,}"),

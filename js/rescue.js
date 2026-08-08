@@ -35,7 +35,8 @@
 
   /* 확실한 토큰 형태 — 발견 시 전송을 막는다 */
   const HARD_SECRET_PATTERNS = [
-    { re: /gh[pousr]_[A-Za-z0-9]{16,}/, name: 'GitHub 액세스 토큰' },
+    { re: /github_pat_[A-Za-z0-9_]{20,}/, name: 'GitHub 토큰(fine-grained)' },
+    { re: /gh[pousr]_[A-Za-z0-9]{16,}/, name: 'GitHub 액세스 토큰(classic)' },
     { re: /\bsk-[A-Za-z0-9_\-]{16,}/, name: 'API 시크릿 키' },
     { re: /AIza[0-9A-Za-z_\-]{20,}/, name: 'Google API 키' },
     { re: /glpat-[0-9A-Za-z_\-]{16,}/, name: 'GitLab 토큰' },
