@@ -6,6 +6,10 @@
 
 /* ------------------------- 태블릿 이하 (~1023px) ------------------------- */
 @media (max-width: 1023px) {
+  /* 2열이 안 되는 폭. 왼쪽 고정 그림을 숨기고, 그림은 고른 카드 안으로 들어간다 */
+  .cmd-layout { display: block; }
+  .cmd-layout__viz { display: none; }
+
   .result__cols { grid-template-columns: minmax(0, 1fr); }
   .preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer__inner { grid-template-columns: minmax(0, 1fr); }
@@ -117,5 +121,8 @@
 @media (min-width: 1024px) {
   .theme-toggle__text { display: inline; }
   .diagram-wrap { padding: 14px 20px; }
+  /* 사이드 그림은 열이 좁아 좌우 여백을 더 줄여야 한다.
+     이 규칙이 없으면 20px 패딩 때문에 최소 폭에 10px 모자라 가로 스크롤이 생긴다. */
+  .diagram-wrap--sm { padding: 10px; }
   .areas { max-width: 700px; }
 }

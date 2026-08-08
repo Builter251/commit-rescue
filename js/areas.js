@@ -66,32 +66,68 @@
   const descEl = document.getElementById('flowDesc');
   const DEFAULT_DESC = descEl ? descEl.textContent : '';
 
-  function clearHighlight() {
-    if (!svg) return;
-    svg.classList.remove('is-focused');
-    svg.querySelectorAll('.is-on, .is-changed').forEach(function (el) {
+  /* 명령어 사전용 그림 — 맨 위 그림을 복제해 쓴다.
+     카드를 누를 때마다 위아래로 스크롤하게 만들지 않으려면 사전 옆에도 그림이 있어야 한다.
+     같은 SVG를 HTML에 두 번 적으면 id가 중복되고 유지보수도 두 배가 되므로,
+     복제본의 id에는 전부 cmd- 접두사를 붙인다.
+     <defs>(화살촉 marker)는 복제하지 않는다. url(#arw) 참조는 문서 전체에서 찾으므로
+     원본 것을 그대로 쓰면 되고, 중복 id도 생기지 않는다. */
+  const CMD_PREFIX = 'cmd-';
+  const cmdSlot = document.getElementById('cmdDiagramSlot');
+  const cmdDescEl = document.getElementById('cmdFlowDesc');
+  const CMD_DEFAULT_DESC = cmdDescEl ? cmdDescEl.textContent : '';
+  let cmdSvg = null;
+
+  if (svg && cmdSlot) {
+    cmdSvg = svg.cloneNode(true);
+    const defs = cmdSvg.querySelector('defs');
+    if (defs) defs.remove();
+    cmdSvg.querySelectorAll('[id]').forEach(function (el) { el.id = CMD_PREFIX + el.id; });
+    cmdSvg.id = 'areaDiagramCmd';
+    cmdSvg.setAttribute('aria-labelledby', CMD_PREFIX + 'areaDiagramTitle ' + CMD_PREFIX + 'areaDiagramDesc');
+    cmdSlot.appendChild(cmdSvg);
+  }
+
+  function clearHighlight(root) {
+    if (!root) return;
+    root.classList.remove('is-focused');
+    root.querySelectorAll('.is-on, .is-changed').forEach(function (el) {
       el.classList.remove('is-on', 'is-changed');
     });
   }
 
   /**
-   * V1 다이어그램에서 특정 명령의 영향 범위를 강조한다 (V3).
-   * @param {string} flowId FLOWS의 키
+   * 특정 그림에서 한 명령의 영향 범위를 강조한다 (V3).
+   * @param {SVGElement} root   대상 SVG
+   * @param {string} prefix     복제본이면 'cmd-', 원본이면 ''
+   * @param {HTMLElement} label 설명을 쓸 요소
+   * @param {string} fallback   강조가 없을 때 되돌릴 문구
+   * @param {string} flowId     FLOWS의 키
    */
-  function highlightFlow(flowId) {
-    if (!svg) return;
-    clearHighlight();
+  function paint(root, prefix, label, fallback, flowId) {
+    if (!root) return;
+    clearHighlight(root);
     const flow = FLOWS[flowId];
     if (!flow || flowId === 'none') {
-      if (descEl) descEl.textContent = DEFAULT_DESC;
+      if (label) label.textContent = fallback;
       return;
     }
-    svg.classList.add('is-focused');
+    root.classList.add('is-focused');
     flow.arrows.concat(flow.areas).forEach(function (id) {
-      const el = svg.querySelector('#' + id);
+      const el = root.querySelector('#' + prefix + id);
       if (el) el.classList.add('is-on');
     });
-    if (descEl) descEl.textContent = flow.desc;
+    if (label) label.textContent = flow.desc;
+  }
+
+  /** 맨 위 그림(한눈에 보기)을 강조한다 */
+  function highlightFlow(flowId) {
+    paint(svg, '', descEl, DEFAULT_DESC, flowId);
+  }
+
+  /** 명령어 사전 옆 그림을 강조한다 */
+  function highlightCmdFlow(flowId) {
+    paint(cmdSvg, CMD_PREFIX, cmdDescEl, CMD_DEFAULT_DESC, flowId);
   }
 
   /**
@@ -164,6 +200,25 @@
           스크린리더가 버튼 하나를 읽는 데 문단 하나를 통째로 읽었다.
      그래서 카드는 평범한 컨테이너로 되돌리고, 전용 버튼을 하나 넣는다.
      마우스 사용자의 "카드 아무 데나 클릭"은 보조 수단으로 남긴다. */
+  /* 그림을 어디에 둘지는 화면 폭이 정한다.
+       넓은 화면 — 왼쪽 열에 고정(sticky). 카드를 눌러도 그림이 계속 보인다.
+       좁은 화면 — 2열이 불가능하다. 대신 고른 카드 "안"으로 그림을 옮긴다.
+                  누른 자리에서 답이 펼쳐지므로 위아래로 오갈 일이 없고,
+                  드롭다운과 달리 명령 목록도 그대로 보인다. */
+  const wideScreen = window.matchMedia('(min-width: 1024px)');
+  let activeCard = null;
+
+  function placeDiagram() {
+    if (!cmdSvg) return;
+    if (wideScreen.matches || !activeCard) {
+      if (cmdSlot && cmdSvg.parentElement !== cmdSlot) cmdSlot.appendChild(cmdSvg);
+    } else {
+      const holder = activeCard.querySelector('.cmd__viz');
+      if (holder && cmdSvg.parentElement !== holder) holder.appendChild(cmdSvg);
+    }
+  }
+  wideScreen.addEventListener('change', placeDiagram);
+
   document.querySelectorAll('.cmd').forEach(function (card) {
     const flowId = card.dataset.flow || 'none';
 
@@ -172,11 +227,16 @@
       document.querySelectorAll('.cmd').forEach(function (c) { c.classList.remove('is-active'); });
       document.querySelectorAll('.flow-buttons .pill').forEach(function (b) { b.classList.remove('is-active'); });
 
-      if (wasActive) { highlightFlow('none'); return; }
+      if (wasActive) {
+        activeCard = null;
+        placeDiagram();
+        highlightCmdFlow('none');
+        return;
+      }
       card.classList.add('is-active');
-      highlightFlow(flowId);
-      const target = document.getElementById('home');   // 섹션 개편으로 #basics -> #home
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      activeCard = card;
+      placeDiagram();
+      highlightCmdFlow(flowId);
     };
 
     // 강조할 영역이 없는 명령(git status, git worktree)은 버튼을 만들지 않는다
@@ -188,9 +248,14 @@
     btn.className = 'cmd__focus';
     btn.textContent = '영향 영역 보기';
     btn.setAttribute('aria-label',
-      (title ? title.textContent.trim() + ' — ' : '') + '영향 영역을 5영역 다이어그램에서 보기');
+      (title ? title.textContent.trim() + ' — ' : '') + '영향 영역을 5칸 그림에서 보기');
     btn.addEventListener('click', activate);
     card.appendChild(btn);
+
+    // 좁은 화면에서 그림이 들어갈 자리
+    const viz = document.createElement('div');
+    viz.className = 'cmd__viz';
+    card.appendChild(viz);
 
     // 마우스 편의용. 카드 안의 버튼·링크 클릭은 그대로 통과시킨다.
     card.addEventListener('click', function (e) {

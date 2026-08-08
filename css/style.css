@@ -446,9 +446,10 @@ code {
 }
 .more[open] > summary::before { content: "▾"; }
 .more > summary:hover { color: var(--fg); }
-.more > *:not(summary) { padding: 0 13px 13px; }
-.more .callout--inline,
-.more .code { margin-left: 13px; margin-right: 13px; padding-left: 0; padding-right: 0; }
+/* 안쪽 여백(padding)이 아니라 바깥 여백(margin)으로 들여쓴다.
+   padding 으로 하면 콜아웃·코드블록이 가진 자기 여백을 덮어써서
+   글자가 테두리에 딱 붙는다. 실제로 그렇게 깨져 있었다. */
+.more > *:not(summary) { margin: 0 13px 13px; }
 
 .opts { list-style: none; display: grid; gap: 6px; font-size: .87rem; }
 .opts li { padding-left: 14px; position: relative; color: var(--fg-muted); }
@@ -899,3 +900,44 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 /* 지금 있지 않은 작업본은 흐리게 */
 .area--muted rect { fill: var(--svg-box-bg); }
 .area--muted .area__name, .area--muted .area__sub { opacity: .7; }
+
+/* ==========================================================================
+   명령어 사전 2열 배치
+   카드를 누를 때마다 맨 위 그림까지 스크롤해서 올라갔다 내려오는 것이
+   실제로 쓰기 나빴다. 사전 옆에 그림을 붙여 시선이 움직이지 않게 한다.
+   ========================================================================== */
+.cmd-layout {
+  display: grid;
+  /* 왼쪽 열이 좁으면 그림 글자가 9px 아래로 떨어져 못 읽는다.
+     이 그림은 폭 660 단위로 그려져 있어 최소 540px 은 있어야 13px 이 나온다. */
+  grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+  gap: 22px; align-items: start;
+}
+.cmd-layout .cmd-list { grid-template-columns: minmax(0, 1fr); }
+
+.viz-sticky { position: sticky; top: calc(var(--nav-h) + 14px); }
+.viz-sticky__label {
+  font-size: .78rem; font-weight: 800; letter-spacing: .03em;
+  color: var(--fg-faint); margin: 0 0 8px;
+}
+.diagram-wrap--sm {
+  max-width: none; padding: 10px;
+  overflow-x: auto;            /* 열이 더 좁아지면 줄이지 말고 넘긴다 */
+  justify-content: flex-start;
+}
+.diagram-wrap--sm .areas {
+  min-width: 528px;            /* 이 아래로는 라벨이 읽히지 않는다 */
+  max-height: calc(100dvh - var(--nav-h) - 170px);
+  min-height: 300px;
+}
+#cmdFlowDesc { text-align: left; margin-top: 10px; }
+
+/* 좁은 화면에서 카드 안에 들어가는 그림 자리 */
+.cmd__viz:empty { display: none; }
+.cmd__viz {
+  margin-top: 12px; padding: 10px;
+  background: var(--bg-inset); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+.cmd__viz .areas { min-width: 520px; max-height: none; }
