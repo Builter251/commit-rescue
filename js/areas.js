@@ -57,7 +57,7 @@
     },
     'switch': {
       arrows: ['arrow-switch'], areas: ['area-local', 'area-branch', 'area-staging', 'area-work'],
-      desc: 'git switch <브랜치> — HEAD 표시를 다른 작업본으로 옮깁니다. 그 작업본의 마지막 버전에 맞춰 책상과 고르는 자리도 다시 채워집니다.'
+      desc: 'git switch <브랜치> — 지금 보고 있는 곳(HEAD)을 다른 작업본으로 옮깁니다. 그 작업본의 마지막 버전에 맞춰 책상과 고르는 자리도 다시 채워집니다.'
     },
     'none': { arrows: [], areas: [], desc: '' }
   };
