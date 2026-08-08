@@ -432,24 +432,20 @@ git config --global push.autoSetupRemote true</code></pre>
     <div class="wrap">
       <h2 id="commands-title" class="section__title">명령어 사전</h2>
       <p class="section__desc">
-        알파벳순이 아니라 <strong>상황순</strong>입니다. 각 카드의 “영향 영역 보기”를 누르면
-        <strong>옆에 붙어 있는 그림</strong>에서 그 명령이 건드리는 칸이 바로 강조됩니다.
+        알파벳순이 아니라 <strong>상황순</strong>입니다. <strong>제목 줄을 누르면 그 자리에서 펼쳐지고</strong>,
+        그 명령이 건드리는 칸이 그림에 강조되어 함께 나옵니다.
         <strong>옵션은 짧은 형태(<code>-m</code>)와 긴 형태(<code>--message</code>)를 함께 적었습니다.</strong>
         검색하면 둘 다 나오는데 같은 것인 줄 모르면 헷갈리기 때문입니다.
       </p>
 
-      <div class="cmd-layout">
-        <!-- 왼쪽: 따라다니는 그림. #home 의 다이어그램을 JS가 복제해 넣는다.
-             원본을 그대로 두 번 쓰면 id 가 중복되므로 복제본은 id 앞에 cmd- 를 붙인다. -->
-        <div class="cmd-layout__viz">
-          <div class="viz-sticky">
-            <p class="viz-sticky__label">고른 명령이 건드리는 칸</p>
-            <div class="diagram-wrap diagram-wrap--sm" id="cmdDiagramSlot"></div>
-            <p class="flow-desc" id="cmdFlowDesc" aria-live="polite">아래에서 명령을 고르면 여기에 표시됩니다.</p>
-          </div>
-        </div>
+      <!-- 펼친 카드 안으로 옮겨 다니는 그림. #home 의 다이어그램을 JS가 복제해 넣는다.
+           원본을 그대로 두 번 쓰면 id 가 중복되므로 복제본은 id 앞에 cmd- 를 붙인다. -->
+      <div class="cmd-viz" id="cmdViz" hidden>
+        <div class="diagram-wrap diagram-wrap--sm" id="cmdDiagramSlot"></div>
+        <p class="flow-desc" id="cmdFlowDesc" aria-live="polite">이 명령이 건드리는 칸입니다.</p>
+      </div>
 
-        <ul class="cmd-list">
+      <ul class="cmd-list">
 
         <li class="cmd" data-flow="none">
           <div class="cmd__head">
@@ -595,7 +591,7 @@ git config --global push.autoSetupRemote true</code></pre>
           <code class="cmd__code">git restore &lt;파일&gt;</code>
           <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> <strong>고르는 자리 → 책상</strong></p>
           <p class="cmd__desc">가져오는 기준이 <code>HEAD</code>가 아니라 <strong>고르는 자리(스테이징)</strong>입니다. 이 차이가 함정을 만듭니다.</p>
-          <details class="more" open>
+          <details class="more">
             <summary>가장 많이 걸리는 함정</summary>
             <div class="callout callout--warn callout--inline">
               <p>
@@ -717,8 +713,7 @@ git worktree remove ../프로젝트-hotfix</code></pre>
             </div>
           </details>
         </li>
-        </ul>
-      </div>
+      </ul>
 
       <h3 class="sub-title">내 기록함과 공유 폴더 비교하기</h3>
       <div class="code">

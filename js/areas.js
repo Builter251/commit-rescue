@@ -67,12 +67,13 @@
   const DEFAULT_DESC = descEl ? descEl.textContent : '';
 
   /* 명령어 사전용 그림 — 맨 위 그림을 복제해 쓴다.
-     카드를 누를 때마다 위아래로 스크롤하게 만들지 않으려면 사전 옆에도 그림이 있어야 한다.
+     카드를 누를 때마다 위아래로 스크롤하게 만들지 않으려면 답이 카드 안에서 나와야 한다.
      같은 SVG를 HTML에 두 번 적으면 id가 중복되고 유지보수도 두 배가 되므로,
      복제본의 id에는 전부 cmd- 접두사를 붙인다.
      <defs>(화살촉 marker)는 복제하지 않는다. url(#arw) 참조는 문서 전체에서 찾으므로
      원본 것을 그대로 쓰면 되고, 중복 id도 생기지 않는다. */
   const CMD_PREFIX = 'cmd-';
+  const cmdViz = document.getElementById('cmdViz');
   const cmdSlot = document.getElementById('cmdDiagramSlot');
   const cmdDescEl = document.getElementById('cmdFlowDesc');
   const CMD_DEFAULT_DESC = cmdDescEl ? cmdDescEl.textContent : '';
@@ -200,67 +201,87 @@
           스크린리더가 버튼 하나를 읽는 데 문단 하나를 통째로 읽었다.
      그래서 카드는 평범한 컨테이너로 되돌리고, 전용 버튼을 하나 넣는다.
      마우스 사용자의 "카드 아무 데나 클릭"은 보조 수단으로 남긴다. */
-  /* 그림을 어디에 둘지는 화면 폭이 정한다.
-       넓은 화면 — 왼쪽 열에 고정(sticky). 카드를 눌러도 그림이 계속 보인다.
-       좁은 화면 — 2열이 불가능하다. 대신 고른 카드 "안"으로 그림을 옮긴다.
-                  누른 자리에서 답이 펼쳐지므로 위아래로 오갈 일이 없고,
-                  드롭다운과 달리 명령 목록도 그대로 보인다. */
-  const wideScreen = window.matchMedia('(min-width: 1024px)');
-  let activeCard = null;
+  /* 사전은 아코디언 한 줄짜리로 접어 둔다.
+     예전에는 왼쪽에 그림을 고정하고 오른쪽에 카드를 전부 펼쳐 놨는데,
+     그림은 화면 한 칸에 머무는 반면 카드 목록만 끝없이 흘러 균형이 맞지 않았다.
+     지금은 접힌 상태에서 위험도·제목·명령어만 보이므로 목록 전체가 한눈에 들어오고,
+     펼친 카드 안에서 설명과 그림이 함께 나오므로 시선이 이동하지 않는다.
+     그림은 한 벌뿐이라 펼쳐지는 카드로 옮겨 다닌다. */
+  const cards = document.querySelectorAll('.cmd');
 
-  function placeDiagram() {
-    if (!cmdSvg) return;
-    if (wideScreen.matches || !activeCard) {
-      if (cmdSlot && cmdSvg.parentElement !== cmdSlot) cmdSlot.appendChild(cmdSvg);
-    } else {
-      const holder = activeCard.querySelector('.cmd__viz');
-      if (holder && cmdSvg.parentElement !== holder) holder.appendChild(cmdSvg);
-    }
+  function collapse(card) {
+    card.classList.remove('is-active');
+    const body = card.querySelector('.cmd__body');
+    const toggle = card.querySelector('.cmd__toggle');
+    if (body) body.hidden = true;
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
   }
-  wideScreen.addEventListener('change', placeDiagram);
 
-  document.querySelectorAll('.cmd').forEach(function (card) {
+  cards.forEach(function (card, i) {
     const flowId = card.dataset.flow || 'none';
+    const head = card.querySelector('.cmd__head');
+    const h3 = head ? head.querySelector('h3') : null;
+    if (!head || !h3) return;
 
-    const activate = function () {
+    /* 제목 줄을 통째로 버튼으로 만든다.
+       heading 안의 button 이 표준 아코디언 형태다. 반대로 하면(button 안에 heading)
+       HTML 콘텐츠 모델 위반이고 제목 목록 탐색에서도 사라진다. */
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'cmd__toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+
+    const risk = head.querySelector('.risk');
+    const code = card.querySelector('.cmd__code');
+    const titleText = h3.textContent.trim();
+    const label = document.createElement('span');
+    label.className = 'cmd__title';
+    label.textContent = titleText;
+
+    if (risk) toggle.appendChild(risk);
+    toggle.appendChild(label);
+    if (code) toggle.appendChild(code);
+
+    h3.textContent = '';
+    h3.className = 'cmd__head';
+    h3.appendChild(toggle);
+    head.replaceWith(h3);
+
+    // 제목 줄을 뺀 나머지는 전부 접히는 영역으로
+    const body = document.createElement('div');
+    body.className = 'cmd__body';
+    body.id = 'cmd-body-' + i;
+    body.hidden = true;
+    while (h3.nextSibling) body.appendChild(h3.nextSibling);
+    card.appendChild(body);
+
+    toggle.setAttribute('aria-controls', body.id);
+    toggle.setAttribute('aria-label', titleText + (flowId === 'none' ? '' : ' — 설명과 영향 영역 보기'));
+
+    toggle.addEventListener('click', function () {
       const wasActive = card.classList.contains('is-active');
-      document.querySelectorAll('.cmd').forEach(function (c) { c.classList.remove('is-active'); });
+      cards.forEach(collapse);
       document.querySelectorAll('.flow-buttons .pill').forEach(function (b) { b.classList.remove('is-active'); });
 
       if (wasActive) {
-        activeCard = null;
-        placeDiagram();
+        if (cmdViz) cmdViz.hidden = true;
         highlightCmdFlow('none');
         return;
       }
       card.classList.add('is-active');
-      activeCard = card;
-      placeDiagram();
-      highlightCmdFlow(flowId);
-    };
+      body.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
 
-    // 강조할 영역이 없는 명령(git status, git worktree)은 버튼을 만들지 않는다
-    if (flowId === 'none') return;
-
-    const title = card.querySelector('h3');
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'cmd__focus';
-    btn.textContent = '영향 영역 보기';
-    btn.setAttribute('aria-label',
-      (title ? title.textContent.trim() + ' — ' : '') + '영향 영역을 5칸 그림에서 보기');
-    btn.addEventListener('click', activate);
-    card.appendChild(btn);
-
-    // 좁은 화면에서 그림이 들어갈 자리
-    const viz = document.createElement('div');
-    viz.className = 'cmd__viz';
-    card.appendChild(viz);
-
-    // 마우스 편의용. 카드 안의 버튼·링크 클릭은 그대로 통과시킨다.
-    card.addEventListener('click', function (e) {
-      if (e.target.closest('button, a')) return;
-      activate();
+      // 강조할 칸이 없는 명령(git status, git worktree)은 그림을 붙이지 않는다
+      if (cmdViz) {
+        if (flowId === 'none') {
+          cmdViz.hidden = true;
+        } else {
+          body.appendChild(cmdViz);
+          cmdViz.hidden = false;
+          highlightCmdFlow(flowId);
+        }
+      }
     });
   });
 
