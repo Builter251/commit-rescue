@@ -236,14 +236,13 @@
         </svg>
       </div>
 
-      <p class="flow-desc" id="flowDesc" aria-live="polite">
+      <!-- 화면에는 보이지 않지만 지우지 않는다.
+           강조 표시는 순수한 시각 효과라, 이 aria-live 문구가 없으면
+           스크린리더 사용자는 알약을 눌러도 무엇이 바뀌었는지 알 방법이 없다. -->
+      <p class="flow-desc sr-only" id="flowDesc" aria-live="polite">
         위 버튼을 누르면 그 명령이 어느 칸에서 어느 칸으로 옮기는지 그림에 표시됩니다.
       </p>
 
-      <div class="stage__actions">
-        <a class="btn btn--primary" href="#rescue">사고가 났어요, 수습하러 가기</a>
-        <a class="btn btn--ghost" href="#words">용어부터 쉽게 볼게요</a>
-      </div>
     </div>
   </section>
 

@@ -272,7 +272,6 @@ code {
   background: var(--bg-alt); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 9px 12px;
 }
-.stage__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
 .pill__ko {
   display: block; font-family: var(--font);
@@ -339,7 +338,7 @@ code {
 .areas {
   display: block;
   width: 100%; height: auto;
-  max-height: calc(100dvh - var(--nav-h) - 272px);
+  max-height: calc(100dvh - var(--nav-h) - 186px);
   min-height: 300px;
 }
 
@@ -399,6 +398,8 @@ code {
 [data-theme="dark"] .pill.is-active { color: #06211f; }
 .pill--reset { font-family: var(--font); }
 .flow-desc { color: var(--fg-muted); font-size: .86rem; min-height: 1.6em; margin: 0; text-align: center; }
+/* sr-only 로 감출 때는 min-height 가 남아 있으면 안 된다 */
+.flow-desc.sr-only { min-height: 0; }
 
 /* 네 가지 사실 */
 /* ------------------------------- 쉬운 말 사전 ------------------------------- */
