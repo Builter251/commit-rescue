@@ -5,7 +5,7 @@
 
 | 항목 | 내용 |
 |---|---|
-| 배포 URL | (배포 후 기입) |
+| 배포 URL | https://commit-rescue.vercel.app |
 | 기획서 | [`commit-rescure-v1.4/서비스기획서_커밋구조대.md`](commit-rescure-v1.4/서비스기획서_커밋구조대.md) |
 | 콘텐츠 설계 | [`commit-rescure-v1.4/학습콘텐츠_시각화설계.md`](commit-rescure-v1.4/학습콘텐츠_시각화설계.md) |
 
@@ -75,7 +75,7 @@ GitHub 상태를 적어둔 메모입니다. 동료가 push해도, 내가 `fetch`
 | 시각화 | 인라인 SVG (라이브러리 없음) | 그리는 요소가 4종뿐이라 직접 구현이 가볍다 |
 | 백엔드 | Vercel Serverless Functions (Python, 표준 라이브러리만) | 과제 요구사항 · 콜드 스타트 최소화 |
 | AI API | Google Gemini (Flash 계열) | 무료 등급, 구조화된 출력(JSON 스키마) 지원 |
-| 배포 | Vercel (GitHub 연동 자동 배포) | 과제 요구사항 |
+| 배포 | Vercel (GitHub 연동 자동 배포 — `main` push 시 프로덕션 반영) | 과제 요구사항 |
 
 ---
 
