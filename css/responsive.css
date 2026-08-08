@@ -45,11 +45,11 @@
   .theme-toggle__text { display: inline; }
 
   /* 무대 — 좁은 화면에서는 여백을 줄이고 그림에 높이를 더 준다 */
-  .section--stage { padding: 16px 0 32px; }
-  .stage { gap: 10px; }
-  .stage__picker { padding: 10px; }
-  .pill { font-size: .76rem; padding: 6px 10px; }
-  .pill__ko { font-size: .68rem; }
+  .section--stage { padding: 12px 0 20px; }
+  .stage { gap: 8px; }
+  .stage__picker { padding: 8px; }
+  .pill { font-size: .84rem; padding: 6px 10px; }
+  .pill__ko { font-size: .76rem; }
 
   /* 다이어그램 — 좁은 화면에서는 폭에 맞춰 줄이면 글자가 8px까지 작아져 읽을 수 없다.
      그래서 억지로 줄이지 않고 최소 폭을 보장한 뒤 그림만 가로로 넘긴다.
@@ -61,7 +61,9 @@
     justify-content: flex-start;
   }
   .areas {
-    min-width: 560px;                  /* 이 폭 아래로는 라벨이 읽히지 않는다 */
+    /* 660 = viewBox 폭. 1:1 로 그려야 아래 px 값이 화면에서도 그대로 나온다.
+       560 으로 줄이면 0.85배가 걸려 13.5px 라벨이 11.5px 로 떨어졌다. */
+    min-width: 660px;
     max-height: calc(100dvh - var(--nav-h) - 160px);
     min-height: 280px;
   }
@@ -69,9 +71,10 @@
   .area__name { font-size: 17px; }
   .area__name--sm { font-size: 15px; }
   .area__sub { font-size: 14px; }
-  .flow__label { font-size: 13.5px; }
+  .flow__label { font-size: 14px; }
   .areas__container-label { font-size: 16px; }
-  .areas__net text { font-size: 13.5px; }
+  .areas__net text { font-size: 14px; }
+  .head-chip text { font-size: 14px; }
 
   /* 쉬운 말 사전 */
   .words { grid-template-columns: minmax(0, 1fr); }

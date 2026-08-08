@@ -110,6 +110,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  /* 브라우저 기본 16px 의 106.25% = 17px.
+     px 로 못 박으면 브라우저 글자 크기 설정을 무시하게 된다. % 로 둬야 따라간다. */
+  font-size: 106.25%;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-h) + 12px);
   -webkit-text-size-adjust: 100%;
@@ -118,7 +121,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--fg);
   background: var(--bg);
@@ -275,7 +278,7 @@ code {
 
 .pill__ko {
   display: block; font-family: var(--font);
-  font-size: .72rem; font-weight: 700; opacity: .75; margin-top: 1px;
+  font-size: .82rem; font-weight: 700; opacity: .75; margin-top: 1px;
 }
 
 .btn {
@@ -297,7 +300,7 @@ code {
 .chip {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 9px; border-radius: 999px;
-  font-size: .74rem; font-weight: 700; border: 1px solid;
+  font-size: .82rem; font-weight: 700; border: 1px solid;
 }
 .chip--change {
   background: var(--risk-warn-bg); color: var(--risk-warn-fg);
@@ -347,7 +350,7 @@ code {
   stroke-width: 2; stroke-dasharray: 8 6;
 }
 .areas__container-label {
-  fill: var(--fg-muted); font-size: 15px; font-weight: 700;
+  fill: var(--fg-muted); font-size: 16px; font-weight: 700;
   font-family: var(--font);
 }
 
@@ -355,30 +358,40 @@ code {
   fill: var(--svg-local-bg); stroke: var(--svg-box-border); stroke-width: 1.6;
   transition: opacity .2s, stroke .2s, stroke-width .2s;
 }
-.area--repo > rect { fill: var(--svg-box-bg); }
+/* 다른 칸을 품기만 하는 상자. .area 가 아니므로 흐림 대상이 아니다. */
+.area-group > rect {
+  fill: var(--svg-box-bg); stroke: var(--svg-box-border); stroke-width: 1.6;
+}
 .area--dashed rect { stroke-dasharray: 7 5; }
 .area--remote rect { fill: var(--svg-remote-bg); stroke: var(--c-remote-1); }
 
 .area__name {
-  fill: var(--fg); font-size: 16px; font-weight: 700; font-family: var(--font);
+  fill: var(--fg); font-size: 17px; font-weight: 700; font-family: var(--font);
 }
-.area__name--sm { font-size: 14px; }
-.area__sub { fill: var(--fg-muted); font-size: 12.5px; font-family: var(--font); }
+.area__name--sm { font-size: 15px; }
+.area__sub { fill: var(--fg-muted); font-size: 13.5px; font-family: var(--font); }
 
 .areas__net line { stroke: var(--svg-container); stroke-width: 1.6; stroke-dasharray: 3 5; }
-.areas__net text { fill: var(--fg-faint); font-size: 12.5px; font-family: var(--font); }
+.areas__net text { fill: var(--fg-faint); font-size: 13.5px; font-family: var(--font); }
 
 .flow path { stroke: var(--svg-arrow); stroke-width: 2; fill: none; transition: stroke .2s, stroke-width .2s; }
 .flow__label {
-  fill: var(--fg-muted); font-size: 12.5px; font-weight: 700;
+  fill: var(--fg-muted); font-size: 13.5px; font-weight: 700;
   font-family: var(--mono); transition: fill .2s;
 }
 
-/* 강조/흐림 (V3) */
+/* 강조/흐림 (V3)
+   SVG 에서 opacity 는 부모와 자식이 곱해진다. 기록함처럼 다른 칸을 품은 g 를
+   .area 로 두면 부모 0.28 x 자식 1 = 0.28 이 되어, 강조한 칸까지 흐리게 그려졌다.
+   (git commit 의 main, git push 의 main·origin/main 이 이 경우였다)
+   그래서 품기만 하는 상자는 .area-group 으로 빼서 흐림 대상에서 제외한다. */
 .areas.is-focused .area,
-.areas.is-focused .flow { opacity: var(--svg-dim); }
+.areas.is-focused .flow,
+.areas.is-focused .head-chip { opacity: var(--svg-dim); }
 .areas.is-focused .area.is-on,
 .areas.is-focused .flow.is-on { opacity: 1; }
+/* HEAD 칩은 바로 앞 작업본이 강조될 때 같이 살아난다 */
+.areas.is-focused .area.is-on + .head-chip { opacity: 1; }
 .area.is-on rect { stroke: var(--accent); stroke-width: 3; }
 .flow.is-on path { stroke: var(--accent); stroke-width: 3.2; marker-end: url(#arw-hi); }
 .flow.is-on .flow__label { fill: var(--accent-strong); }
@@ -423,11 +436,20 @@ code {
 .word__real code {
   background: var(--accent-soft); color: var(--accent-strong);
   border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  font-size: .8rem; font-weight: 700;
+  font-size: .82rem; font-weight: 700;
 }
 .word__desc { margin: 0; font-size: .9rem; color: var(--fg-muted); }
 .word__desc em { font-style: normal; font-weight: 700; color: var(--fg); }
+/* 가장 많이 헷갈리는 두 낱말.
+   테두리만 두꺼우면 왜 다른지 알 수 없어 장식으로 읽힌다. 이유를 글로 붙인다.
+   색과 굵기에만 기대면 색을 구분하지 못하는 사람에게는 아무 표시도 아니다. */
 .word--key { border-color: var(--accent); border-width: 2px; padding: 14px 16px; }
+.word__flag {
+  display: inline-block; margin: 0 0 6px;
+  padding: 2px 9px; border-radius: 999px;
+  background: var(--accent); color: var(--bg);
+  font-size: .82rem; font-weight: 800;
+}
 
 /* ---------------------------- 접기 (높이 절약) ----------------------------
    한 덩어리가 화면 높이를 넘지 않게 하는 것이 목적이다.
@@ -496,7 +518,7 @@ code {
   position: absolute; top: 8px; right: 8px;
   padding: 5px 11px; border-radius: 7px;
   border: 1px solid var(--border-strong); background: var(--bg-card);
-  color: var(--fg-muted); font: inherit; font-size: .78rem; font-weight: 700;
+  color: var(--fg-muted); font: inherit; font-size: .82rem; font-weight: 700;
   cursor: pointer; line-height: 1.4;
 }
 .code .copy-btn:hover { color: var(--fg); border-color: var(--accent); }
@@ -518,13 +540,13 @@ code {
 .preset.is-active { border-color: var(--accent); background: var(--accent-soft); }
 .preset__title { font-weight: 700; font-size: .95rem; line-height: 1.45; }
 .preset__foot { display: flex; align-items: center; gap: 6px; }
-.preset__instant { font-size: .72rem; color: var(--fg-faint); font-weight: 700; }
+.preset__instant { font-size: .82rem; color: var(--fg-faint); font-weight: 700; }
 
 /* 위험도 배지 — 색 외에 아이콘 + 텍스트로도 구분 (기획서 8.2절) */
 .risk {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 3px 10px; border-radius: 999px;
-  font-size: .76rem; font-weight: 800; border: 1px solid; white-space: nowrap;
+  font-size: .82rem; font-weight: 800; border: 1px solid; white-space: nowrap;
 }
 .risk--safe   { color: var(--risk-safe-fg);   background: var(--risk-safe-bg);   border-color: currentColor; }
 .risk--warn   { color: var(--risk-warn-fg);   background: var(--risk-warn-bg);   border-color: currentColor; border-style: dashed; }
@@ -541,7 +563,7 @@ code {
 .field { display: grid; gap: 6px; }
 .field > label, .field legend { font-weight: 700; font-size: .93rem; }
 .req {
-  font-size: .72rem; font-weight: 800; color: var(--risk-danger-fg);
+  font-size: .82rem; font-weight: 800; color: var(--risk-danger-fg);
   background: var(--risk-danger-bg); padding: 1px 7px; border-radius: 999px;
   margin-left: 4px; vertical-align: 1px;
 }
@@ -626,11 +648,11 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 }
 .result__badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .result__source {
-  font-size: .74rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+  font-size: .82rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;
   background: var(--accent-soft); color: var(--accent-strong);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
 }
-.result__where { font-size: .74rem; font-weight: 700; color: var(--fg-muted); border: 1px solid var(--border-strong); padding: 3px 10px; border-radius: 999px; }
+.result__where { font-size: .82rem; font-weight: 700; color: var(--fg-muted); border: 1px solid var(--border-strong); padding: 3px 10px; border-radius: 999px; }
 .result__summary { font-size: 1.15rem; font-weight: 700; margin: 0; }
 
 .result__body { padding: 20px; display: grid; gap: 18px; }
@@ -672,7 +694,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   position: absolute; left: 15px; top: 14px;
   width: 24px; height: 24px; border-radius: 50%;
   background: var(--accent); color: #fff;
-  font-size: .8rem; font-weight: 800; display: grid; place-items: center;
+  font-size: .82rem; font-weight: 800; display: grid; place-items: center;
 }
 [data-theme="dark"] .step::before { color: #06211f; }
 .step > .code { margin: 0 0 8px; }
@@ -690,14 +712,14 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 }
 .mini-area__mark { font-weight: 800; width: 1.2em; text-align: center; flex: none; }
 .mini-area__name { font-weight: 700; }
-.mini-area__note { color: var(--fg-muted); font-size: .8rem; margin-left: auto; text-align: right; }
+.mini-area__note { color: var(--fg-muted); font-size: .82rem; margin-left: auto; text-align: right; }
 .mini-area.is-changed {
   border-color: var(--risk-warn-fg); border-width: 2px;
   background: color-mix(in srgb, var(--risk-warn-bg) 50%, transparent);
 }
 .mini-area.is-kept { border-style: dashed; }
 .mini-area.is-none { opacity: .55; }
-.mini-areas__legend { font-size: .8rem; color: var(--fg-muted); margin: 8px 0 0; }
+.mini-areas__legend { font-size: .82rem; color: var(--fg-muted); margin: 8px 0 0; }
 
 /* 그래프 */
 .graph-box { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--bg-inset); }
@@ -708,7 +730,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   border-radius: 8px; padding: 9px 12px; margin-bottom: 12px;
 }
 .graph-stage + .graph-stage { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-strong); }
-.graph-stage__label { font-size: .78rem; font-weight: 800; color: var(--fg-faint); margin-bottom: 4px; letter-spacing: .04em; }
+.graph-stage__label { font-size: .82rem; font-weight: 800; color: var(--fg-faint); margin-bottom: 4px; letter-spacing: .04em; }
 .graph-scroll { overflow-x: auto; }
 .commit-graph { display: block; }
 .commit-graph .cg-link { stroke: var(--svg-line); stroke-width: 2; fill: none; }
@@ -749,7 +771,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   position: absolute; left: 13px; top: 12px;
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--border-strong); color: var(--bg-card);
-  font-size: .76rem; font-weight: 800; display: grid; place-items: center;
+  font-size: .82rem; font-weight: 800; display: grid; place-items: center;
 }
 .gate__step.is-done::before { content: "✓"; background: var(--risk-safe-fg); color: #fff; }
 .gate__step label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: .91rem; font-weight: 700; }
@@ -763,7 +785,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .gate__loss--stay li::before { content: "✓"; position: absolute; left: 0; color: var(--risk-safe-fg); font-weight: 800; }
 .gate__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .gate__bypass {
-  font-size: .78rem; color: var(--fg-faint);
+  font-size: .82rem; color: var(--fg-faint);
   background: none; border: 0; text-decoration: underline; cursor: pointer;
   font-family: inherit; padding: 0;
 }
@@ -798,7 +820,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 }
 .cmd__area { font-size: .87rem; margin-bottom: 8px; }
 .cmd__area-label {
-  display: inline-block; font-size: .7rem; font-weight: 800; letter-spacing: .04em;
+  display: inline-block; font-size: .82rem; font-weight: 800; letter-spacing: .04em;
   color: var(--fg-faint); border: 1px solid var(--border-strong);
   border-radius: 4px; padding: 0 5px; margin-right: 6px; vertical-align: 1.5px;
 }
@@ -862,7 +884,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .cmd .more > *:not(summary) { max-height: 44dvh; overflow-y: auto; }
 
 /* 쉬운 말 사전 카드 */
-.word { max-height: 40dvh; overflow-y: auto; }
+.word { max-height: 44dvh; overflow-y: auto; }
 
 /* 폼 안내 문구가 화면을 밀지 않도록 */
 .optional__body { max-height: 56dvh; overflow-y: auto; }
@@ -882,7 +904,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   fill: var(--accent); stroke: none;
 }
 .head-chip text {
-  fill: var(--bg); font-size: 12px; font-weight: 800;
+  fill: var(--bg); font-size: 13px; font-weight: 800;
   font-family: var(--mono);
 }
 /* 지금 있지 않은 작업본은 흐리게 */
@@ -907,7 +929,7 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
   font: inherit; color: inherit; text-align: left; cursor: pointer;
 }
 .cmd__toggle::after {
-  content: "▾"; color: var(--fg-faint); font-size: .8rem;
+  content: "▾"; color: var(--fg-faint); font-size: .82rem;
   transition: transform .15s;
 }
 .cmd.is-active .cmd__toggle::after { transform: rotate(180deg); color: var(--accent); }
