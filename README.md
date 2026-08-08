@@ -36,7 +36,7 @@ Git 입문자의 어려움은 "명령어를 모르는 것"이 아니라
 | 버전 하나 | 커밋 commit |
 | 이번 버전에 넣을 것 고르기 | 스테이징 staging · index |
 | 내 기록함 | 로컬 저장소 `.git` |
-| 작업 줄기 | 브랜치 branch |
+| 작업본 | 브랜치 branch |
 | 지금 내가 있는 곳 | HEAD |
 | 공유 폴더 | 원격 저장소 remote · GitHub |
 | **공유 폴더 메모** | **`origin/main`** |

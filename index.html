@@ -86,6 +86,7 @@
           <button type="button" class="pill" data-flow="fetch">git fetch<span class="pill__ko">받아오기</span></button>
           <button type="button" class="pill" data-flow="merge">git merge<span class="pill__ko">합치기</span></button>
           <button type="button" class="pill" data-flow="pull">git pull<span class="pill__ko">받아서 합치기</span></button>
+          <button type="button" class="pill" data-flow="switch">git switch<span class="pill__ko">작업본 옮기기</span></button>
           <button type="button" class="pill" data-flow="restore">git restore<span class="pill__ko">되돌리기</span></button>
           <button type="button" class="pill" data-flow="restore-staged">git restore --staged<span class="pill__ko">담은 것 빼기</span></button>
           <button type="button" class="pill pill--reset" data-flow="none">강조 지우기</button>
@@ -101,17 +102,19 @@
 
       <div class="diagram-wrap">
         <!-- ===== V1 : 5영역 다이어그램 ===== -->
-        <svg id="areaDiagram" class="areas" viewBox="0 0 660 480" role="img"
+        <svg id="areaDiagram" class="areas" viewBox="0 0 660 500" role="img"
              aria-labelledby="areaDiagramTitle areaDiagramDesc" preserveAspectRatio="xMidYMid meet">
           <title id="areaDiagramTitle">Git의 5개 칸과 내 컴퓨터·GitHub 경계 다이어그램</title>
           <desc id="areaDiagramDesc">
             내 컴퓨터 안에는 작업 폴더(책상), 스테이징 영역(이번 버전에 넣을 것 고르는 자리),
-            로컬 저장소(내 기록함)가 있고, 기록함 안에는 내 원고 기록인 main 줄기와
-            마지막으로 확인한 공유 폴더 상태를 적어둔 origin/main 메모가 있습니다.
+            로컬 저장소(내 기록함)가 있습니다. 기록함 안에는 작업본이 여러 개 있을 수 있고,
+            지금은 main 작업본과 feature 작업본이 있으며 HEAD 표시가 지금 있는 작업본을 가리킵니다.
+            git switch는 이 HEAD 표시를 다른 작업본으로 옮깁니다.
+            기록함에는 마지막으로 확인한 공유 폴더 상태를 적어둔 origin/main 메모도 있습니다.
             네트워크 경계 밖에 GitHub의 main, 즉 공유 폴더가 있습니다.
-            git add는 책상에서 고르는 자리로, git commit은 고른 것을 버전으로 남겨 기록함에,
+            git add는 책상에서 고르는 자리로, git commit은 고른 것을 버전으로 남겨 지금 작업본에,
             git push는 기록함에서 공유 폴더로, git fetch는 공유 폴더에서 origin/main 메모로,
-            git merge는 origin/main에서 내 기록함과 책상으로 옮깁니다.
+            git merge는 origin/main 메모의 내용을 지금 작업본으로 합칩니다.
             git restore 파일은 고르는 자리에서 책상으로, git restore --staged는 기록함에서 고르는 자리로 되돌립니다.
           </desc>
 
@@ -126,7 +129,7 @@
 
           <!-- 내 컴퓨터 컨테이너 -->
           <g class="areas__container">
-            <rect x="16" y="10" width="628" height="350" rx="16"></rect>
+            <rect x="16" y="10" width="628" height="366" rx="16"></rect>
             <text class="areas__container-label" x="34" y="32">내 컴퓨터 (로컬)</text>
           </g>
 
@@ -146,43 +149,61 @@
 
           <!-- 3·4 로컬 저장소 -->
           <g class="area area--repo" id="area-repo">
-            <rect x="54" y="196" width="552" height="156" rx="11"></rect>
+            <rect x="54" y="196" width="552" height="170" rx="11"></rect>
             <text class="area__name" x="76" y="216">내 기록함 — 로컬 저장소 (.git)</text>
 
+            <!-- 3. 지금 있는 작업본 (main) + HEAD -->
             <g class="area" id="area-local" data-area="local">
-              <rect x="74" y="226" width="232" height="86" rx="9"></rect>
-              <text class="area__name area__name--sm" x="90" y="248">3. main 줄기</text>
-              <text class="area__sub" x="90" y="267">내가 남긴 버전들</text>
-              <text class="area__sub" x="90" y="284">버전을 남기면</text>
-              <text class="area__sub" x="90" y="301">줄기도 따라 옮겨감</text>
+              <rect x="74" y="226" width="190" height="48" rx="9"></rect>
+              <text class="area__name area__name--sm" x="90" y="248">3. main 작업본</text>
+              <text class="area__sub" x="90" y="266">내가 남긴 버전들</text>
+            </g>
+            <g class="head-chip" id="head-chip">
+              <rect x="188" y="230" width="66" height="20" rx="10"></rect>
+              <text x="221" y="244" text-anchor="middle">HEAD</text>
             </g>
 
+            <!-- 다른 작업본 -->
+            <g class="area area--dashed area--muted" id="area-branch">
+              <rect x="74" y="298" width="190" height="44" rx="9"></rect>
+              <text class="area__name area__name--sm" x="90" y="319">feature 작업본</text>
+              <text class="area__sub" x="90" y="336">다른 일감을 여기서</text>
+            </g>
+
+            <!-- git switch : HEAD 가 작업본 사이를 오간다 -->
+            <g class="flow" id="arrow-switch">
+              <path d="M120,278 L120,294" marker-start="url(#arw)" marker-end="url(#arw)"></path>
+              <text class="flow__label" x="134" y="292">git switch</text>
+            </g>
+
+            <!-- 4. origin/main 메모 -->
             <g class="area area--dashed" id="area-origin" data-area="origin-tracking">
-              <rect x="354" y="226" width="232" height="86" rx="9"></rect>
-              <text class="area__name area__name--sm" x="370" y="248">4. origin/main 메모</text>
-              <text class="area__sub" x="370" y="267">마지막으로 확인했을 때</text>
-              <text class="area__sub" x="370" y="284">공유 폴더가 어디까지였는지</text>
-              <text class="area__sub" x="370" y="301">적어둔 메모 (내 컴퓨터에 있음)</text>
+              <rect x="356" y="226" width="230" height="116" rx="9"></rect>
+              <text class="area__name area__name--sm" x="372" y="248">4. origin/main 메모</text>
+              <text class="area__sub" x="372" y="268">마지막으로 확인했을 때</text>
+              <text class="area__sub" x="372" y="285">공유 폴더가 어디까지였는지</text>
+              <text class="area__sub" x="372" y="302">적어둔 메모</text>
+              <text class="area__sub" x="372" y="319">(내 컴퓨터에 있음)</text>
             </g>
 
-            <!-- git merge origin/main -->
+            <!-- git merge : 메모 내용을 지금 있는 작업본으로 -->
             <g class="flow" id="arrow-merge">
-              <path d="M470,312 L470,328 L190,328 L190,316" marker-end="url(#arw)"></path>
-              <text class="flow__label" x="330" y="345" text-anchor="middle">git merge origin/main</text>
+              <path d="M354,252 L268,252" marker-end="url(#arw)"></path>
+              <text class="flow__label" x="311" y="244" text-anchor="middle">git merge</text>
             </g>
           </g>
 
           <!-- 네트워크 경계 -->
           <g class="areas__net">
-            <line x1="54" y1="386" x2="606" y2="386"></line>
-            <text x="330" y="380" text-anchor="middle">↕ 네트워크 (인터넷이 필요한 구간)</text>
+            <line x1="54" y1="404" x2="606" y2="404"></line>
+            <text x="330" y="398" text-anchor="middle">↕ 네트워크 (인터넷 필요)</text>
           </g>
 
           <!-- 5. GitHub -->
           <g class="area area--remote" id="area-remote" data-area="remote">
-            <rect x="54" y="406" width="552" height="58" rx="11"></rect>
-            <text class="area__name" x="76" y="431">5. 공유 폴더 — GitHub의 main</text>
-            <text class="area__sub" x="76" y="451">동료도 함께 보는 진짜 원격 상태</text>
+            <rect x="54" y="424" width="552" height="58" rx="11"></rect>
+            <text class="area__name" x="76" y="449">5. 공유 폴더 — GitHub의 main</text>
+            <text class="area__sub" x="76" y="469">동료도 함께 보는 진짜 원격 상태</text>
           </g>
 
           <!-- 화살표들 -->
@@ -205,12 +226,12 @@
           </g>
 
           <g class="flow" id="arrow-push">
-            <path d="M168,312 L168,402" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="182" y="370">git push</text>
+            <path d="M120,366 L120,420" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="134" y="382">git push</text>
           </g>
           <g class="flow flow--back" id="arrow-fetch">
-            <path d="M502,406 L502,316" marker-end="url(#arw)"></path>
-            <text class="flow__label" x="488" y="370" text-anchor="end">git fetch</text>
+            <path d="M502,424 L502,346" marker-end="url(#arw)"></path>
+            <text class="flow__label" x="488" y="382" text-anchor="end">git fetch</text>
           </g>
         </svg>
       </div>
@@ -249,17 +270,17 @@
         <li class="word">
           <p class="word__easy">내 기록함</p>
           <p class="word__real"><code>로컬 저장소 .git</code></p>
-          <p class="word__desc">떠둔 버전이 쌓이는 곳. <strong>내 컴퓨터 안에 있습니다.</strong> 인터넷이 끊겨도 버전을 남겨둘 수 있는 이유입니다.</p>
+          <p class="word__desc">남긴 버전이 쌓이는 곳. <strong>내 컴퓨터 안에 있습니다.</strong> 인터넷이 끊겨도 버전을 남겨둘 수 있는 이유입니다.</p>
         </li>
         <li class="word">
-          <p class="word__easy">작업 줄기</p>
+          <p class="word__easy">작업본</p>
           <p class="word__real"><code>브랜치 branch</code></p>
-          <p class="word__desc">같은 원고에서 갈라져 나와 따로 고쳐나가는 줄기. “지금 여기까지”를 가리키는 이름표이기도 해서, 새 버전을 남기면 이름표도 따라 옮겨갑니다. 줄기를 하나 더 만들면 원고가 두 줄기로 나뉘어 각자 고쳐나갈 수 있습니다.</p>
+          <p class="word__desc">같은 원고에서 갈라져 나와 따로 고쳐나가는 작업본. “지금 여기까지”를 가리키는 이름표이기도 해서, 새 버전을 남기면 이름표도 따라 옮겨갑니다. 작업본을 하나 더 만들면 원고가 두 작업본으로 나뉘어 각자 고쳐나갈 수 있습니다.</p>
         </li>
         <li class="word">
           <p class="word__easy">지금 내가 있는 곳</p>
           <p class="word__real"><code>HEAD</code></p>
-          <p class="word__desc">여러 줄기 중 <em>지금 내가 서 있는 자리</em>. 보통은 <code>main</code> 줄기와 같은 자리에 있습니다.</p>
+          <p class="word__desc">여러 작업본 중 <em>지금 내가 서 있는 자리</em>. 보통은 <code>main</code> 작업본와 같은 자리에 있습니다.</p>
         </li>
         <li class="word">
           <p class="word__easy">공유 폴더</p>
@@ -281,15 +302,15 @@
           <p class="word__desc">공유 폴더을 내 컴퓨터로 처음 한 번 통째로 가져오는 것.</p>
         </li>
         <li class="word">
-          <p class="word__easy">두 줄기로 나뉜 원고를 하나로 합치기</p>
+          <p class="word__easy">두 작업본으로 나뉜 원고를 하나로 합치기</p>
           <p class="word__real"><code>머지 merge</code></p>
-          <p class="word__desc">따로 고쳐온 두 줄기로 나뉜 원고를 하나로 모읍니다. 편집자가 두 원고를 나란히 놓고 합치는 것과 같습니다.</p>
+          <p class="word__desc">따로 고쳐온 두 작업본으로 나뉜 원고를 하나로 모읍니다. 편집자가 두 원고를 나란히 놓고 합치는 것과 같습니다.</p>
         </li>
         <li class="word word--key">
           <p class="word__easy">같은 문장을 서로 다르게 고침</p>
           <p class="word__real"><code>충돌 conflict</code></p>
           <p class="word__desc">
-            두 줄기로 나뉜 원고를 합치려는데, <em>같은 줄</em>을 한쪽은 A로 다른 쪽은 B로 고쳐놨을 때 생깁니다.
+            두 작업본으로 나뉜 원고를 합치려는데, <em>같은 줄</em>을 한쪽은 A로 다른 쪽은 B로 고쳐놨을 때 생깁니다.
             Git은 어느 쪽이 맞는지 알 수 없어서 <strong>“여기는 네가 정해라”</strong>하고 멈춥니다.
             겁먹을 일이 아니라 <em>편집자에게 결정을 넘긴 것</em>입니다. 파일을 열어 남길 쪽만 남기고
             <code>git add</code> 한 뒤 이어서 진행하면 됩니다.
@@ -345,7 +366,7 @@ git config --global push.autoSetupRemote true</code></pre>
           <div class="field">
             <label for="situation">어떤 상황인가요? <span class="req">필수</span></label>
             <textarea id="situation" name="situation" rows="3" maxlength="1200"
-              placeholder="예) 어제 만든 줄기에서 작업하다가 실수로 main에 합쳤는데, 그 전에 버전 하나를 빼먹은 것 같아요"
+              placeholder="예) 어제 만든 작업본에서 작업하다가 실수로 main에 합쳤는데, 그 전에 버전 하나를 빼먹은 것 같아요"
               aria-describedby="situationHelp situationCount"></textarea>
             <div class="field__meta">
               <span id="situationHelp" class="field__help">5자 이상 1,000자 이내로 적어주세요.</span>
@@ -427,7 +448,7 @@ git config --global push.autoSetupRemote true</code></pre>
           </div>
           <code class="cmd__code">git init -b main</code>
           <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함(.git)이 새로 생김</p>
-          <p class="cmd__desc"><code>-b main</code>을 빼면 Git 설정에 따라 첫 줄기 이름이 <code>master</code>가 될 수 있습니다.</p>
+          <p class="cmd__desc"><code>-b main</code>을 빼면 Git 설정에 따라 첫 작업본 이름이 <code>master</code>가 될 수 있습니다.</p>
           <details class="more">
             <summary>이미 있는 원고를 받아오려면 · 주소 확인</summary>
             <ul class="opts">
@@ -452,7 +473,7 @@ git config --global push.autoSetupRemote true</code></pre>
             <summary>옵션 풀어쓰기</summary>
             <ul class="opts">
               <li><code>-s</code> = <code>--short</code> — 짧게 요약해서 봅니다</li>
-              <li><code>-b</code> = <code>--branch</code> — 지금 어느 줄기(브랜치)에 있는지 같이 보여줍니다</li>
+              <li><code>-b</code> = <code>--branch</code> — 지금 어느 작업본(브랜치)에 있는지 같이 보여줍니다</li>
               <li><code>git diff</code> — 책상과 고르는 자리의 차이</li>
               <li><code>git diff --staged</code> = <code>git diff --cached</code> — 고르는 자리와 마지막 버전의 차이. <strong>두 이름이 같은 뜻</strong>인데 검색하면 둘 다 나옵니다</li>
             </ul>
@@ -518,9 +539,9 @@ git config --global push.autoSetupRemote true</code></pre>
           <details class="more">
             <summary>옵션 풀어쓰기</summary>
             <ul class="opts">
-              <li><code>-u</code> = <code>--set-upstream</code> — “이 줄기는 앞으로 여기에 올린다”를 한 번 정해둡니다</li>
+              <li><code>-u</code> = <code>--set-upstream</code> — “이 작업본는 앞으로 여기에 올린다”를 한 번 정해둡니다</li>
               <li><code>-f</code> = <code>--force</code> — <strong>강제로 덮어씁니다. 동료의 버전이 사라질 수 있습니다</strong></li>
-              <li><code>-d</code> = <code>--delete</code> — 공유 폴더 쪽 줄기를 지웁니다</li>
+              <li><code>-d</code> = <code>--delete</code> — 공유 폴더 쪽 작업본을 지웁니다</li>
             </ul>
           </details>
         </li>
@@ -539,7 +560,7 @@ git config --global push.autoSetupRemote true</code></pre>
           <details class="more">
             <summary>옵션 풀어쓰기</summary>
             <ul class="opts">
-              <li><code>-p</code> = <code>--prune</code> — 공유 폴더에서 사라진 줄기를 내 쪽 목록에서도 정리합니다</li>
+              <li><code>-p</code> = <code>--prune</code> — 공유 폴더에서 사라진 작업본를 내 쪽 목록에서도 정리합니다</li>
               <li><code>-t</code> = <code>--tags</code> — 태그도 함께 받아옵니다</li>
               <li><code>--all</code> — <strong>짧은 형태가 없습니다.</strong> (<code>-a</code>는 <code>--append</code>라 뜻이 다릅니다)</li>
             </ul>
@@ -612,7 +633,7 @@ git config --global push.autoSetupRemote true</code></pre>
         <li class="cmd" data-flow="switch">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>다른 줄기로 옮겨가기</h3>
+            <h3>다른 작업본으로 옮겨가기</h3>
           </div>
           <code class="cmd__code">git switch &lt;브랜치&gt;</code>
           <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 내 기록함 → 고르는 자리 + 책상</p>
@@ -620,10 +641,10 @@ git config --global push.autoSetupRemote true</code></pre>
           <details class="more">
             <summary>옵션 풀어쓰기</summary>
             <ul class="opts">
-              <li><code>-c</code> = <code>--create</code> — 새 줄기를 만들면서 옮겨갑니다</li>
+              <li><code>-c</code> = <code>--create</code> — 새 작업본를 만들면서 옮겨갑니다</li>
               <li><code>-C</code> = <code>--force-create</code> — 이미 있어도 덮어쓰며 만듭니다</li>
-              <li><code>-d</code> = <code>--detach</code> — 줄기 이름 없이 특정 버전만 펼쳐 봅니다</li>
-              <li><code>git switch -</code> — 바로 전 줄기로 돌아갑니다</li>
+              <li><code>-d</code> = <code>--detach</code> — 작업본 이름 없이 특정 버전만 펼쳐 봅니다</li>
+              <li><code>git switch -</code> — 바로 전 작업본로 돌아갑니다</li>
             </ul>
           </details>
         </li>
@@ -667,7 +688,7 @@ git config --global push.autoSetupRemote true</code></pre>
         <li class="cmd" data-flow="none">
           <div class="cmd__head">
             <span class="risk risk--safe"><span aria-hidden="true">✓</span> 안전</span>
-            <h3>줄기를 옮기지 않고 동시에 작업하기</h3>
+            <h3>작업본를 옮기지 않고 동시에 작업하기</h3>
           </div>
           <code class="cmd__code">git worktree add &lt;경로&gt; &lt;브랜치&gt;</code>
           <p class="cmd__area"><span class="cmd__area-label">바뀌는 칸</span> 새 책상(작업 폴더)이 하나 더 생김</p>
@@ -681,7 +702,7 @@ git worktree remove ../프로젝트-hotfix</code></pre>
               <button class="copy-btn" type="button" data-copy="git worktree add ../프로젝트-hotfix hotfix">복사</button>
             </div>
             <div class="callout callout--warn callout--inline">
-              <p><strong>같은 줄기를 두 폴더에서 동시에 열 수 없습니다.</strong> 이 제약을 모르면 오류 메시지를 이해할 수 없습니다.</p>
+              <p><strong>같은 작업본를 두 폴더에서 동시에 열 수 없습니다.</strong> 이 제약을 모르면 오류 메시지를 이해할 수 없습니다.</p>
               <p><strong><code>stash</code>와의 차이</strong> — <code>stash</code>는 한 폴더 안에서 작업을 서랍에 치워두는 것이고, worktree는 폴더를 하나 더 만드는 것입니다.</p>
             </div>
           </details>
@@ -715,14 +736,14 @@ git log --oneline main..origin/main   # 공유 폴더에는 있고 내게 없는
           <tbody>
             <tr><td>고르는 자리 내용으로 파일 되돌리기</td><td><code>git restore &lt;파일&gt;</code></td><td><code>git checkout -- &lt;파일&gt;</code></td></tr>
             <tr><td>담은 것 빼기</td><td><code>git restore --staged &lt;파일&gt;</code></td><td><code>git reset HEAD &lt;파일&gt;</code></td></tr>
-            <tr><td>줄기 옮기기</td><td><code>git switch &lt;브랜치&gt;</code></td><td><code>git checkout &lt;브랜치&gt;</code></td></tr>
-            <tr><td>줄기 만들고 옮기기</td><td><code>git switch -c &lt;브랜치&gt;</code></td><td><code>git checkout -b &lt;브랜치&gt;</code></td></tr>
-            <tr><td>바로 전 줄기로</td><td><code>git switch -</code></td><td><code>git checkout -</code></td></tr>
+            <tr><td>작업본 옮기기</td><td><code>git switch &lt;브랜치&gt;</code></td><td><code>git checkout &lt;브랜치&gt;</code></td></tr>
+            <tr><td>작업본 만들고 옮기기</td><td><code>git switch -c &lt;브랜치&gt;</code></td><td><code>git checkout -b &lt;브랜치&gt;</code></td></tr>
+            <tr><td>바로 전 작업본로</td><td><code>git switch -</code></td><td><code>git checkout -</code></td></tr>
           </tbody>
         </table>
       </div>
       <p class="note">
-        <code>checkout</code> 하나가 “줄기 옮기기”와 “파일 되돌리기”라는 전혀 다른 일을 담당했던 것이 혼란의 큰 원인이었습니다.
+        <code>checkout</code> 하나가 “작업본 옮기기”와 “파일 되돌리기”라는 전혀 다른 일을 담당했던 것이 혼란의 큰 원인이었습니다.
         <code>switch</code>와 <code>restore</code>는 2019년 도입 후 오랫동안 실험 상태였다가 2025년에 정식이 되었고,
         그래서 기존 자료 대부분이 아직 <code>checkout</code> 기준입니다.
       </p>
@@ -746,14 +767,14 @@ git log --oneline main..origin/main   # 공유 폴더에는 있고 내게 없는
               <td><code>pop</code>은 꺼내면서 서랍에서 지우고, <code>apply</code>는 서랍에 그대로 둡니다</td>
             </tr>
             <tr>
-              <td>줄기 지우기</td>
+              <td>작업본 지우기</td>
               <td><code>git branch -d</code> / <code>-D</code></td>
-              <td><code>-d</code> = <code>--delete</code>는 합쳐진 줄기만 지웁니다. <strong>대문자 <code>-D</code>는 확인 없이 강제로</strong> 지웁니다</td>
+              <td><code>-d</code> = <code>--delete</code>는 합쳐진 작업본만 지웁니다. <strong>대문자 <code>-D</code>는 확인 없이 강제로</strong> 지웁니다</td>
             </tr>
             <tr>
-              <td>줄기 목록 보기</td>
+              <td>작업본 목록 보기</td>
               <td><code>git branch -a</code></td>
-              <td><code>-a</code> = <code>--all</code> — 공유 폴더 쪽 줄기까지 함께 봅니다</td>
+              <td><code>-a</code> = <code>--all</code> — 공유 폴더 쪽 작업본까지 함께 봅니다</td>
             </tr>
             <tr>
               <td>원고 기록을 그림으로</td>

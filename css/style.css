@@ -339,7 +339,7 @@ code {
 .areas {
   display: block;
   width: 100%; height: auto;
-  max-height: calc(100dvh - var(--nav-h) - 250px);
+  max-height: calc(100dvh - var(--nav-h) - 272px);
   min-height: 300px;
 }
 
@@ -886,3 +886,16 @@ input[type="radio"] { accent-color: var(--accent); width: 17px; height: 17px; }
 .gate__steps,
 .graph-box,
 .optional__body { scrollbar-width: thin; overscroll-behavior: contain; }
+
+/* HEAD 칩 — 지금 어느 작업본에 있는지 표시.
+   git switch 가 무엇을 옮기는지 그림으로 보여주려면 이 표시가 반드시 필요하다. */
+.head-chip rect {
+  fill: var(--accent); stroke: none;
+}
+.head-chip text {
+  fill: var(--bg); font-size: 12px; font-weight: 800;
+  font-family: var(--mono);
+}
+/* 지금 있지 않은 작업본은 흐리게 */
+.area--muted rect { fill: var(--svg-box-bg); }
+.area--muted .area__name, .area--muted .area__sub { opacity: .7; }

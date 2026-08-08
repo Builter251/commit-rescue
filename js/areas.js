@@ -11,9 +11,9 @@
   const AREA_META = {
     'work':            { no: '1.', name: '작업 폴더',      where: '내 컴퓨터' },
     'staging':         { no: '2.', name: '스테이징 영역',   where: '내 컴퓨터' },
-    'local':           { no: '3.', name: '로컬 main',       where: '내 컴퓨터' },
-    'origin-tracking': { no: '4.', name: 'origin/main',     where: '내 컴퓨터 (기록)' },
-    'remote':          { no: '5.', name: 'GitHub main',     where: 'GitHub' }
+    'local':           { no: '3.', name: '내 작업본',        where: '내 컴퓨터' },
+    'origin-tracking': { no: '4.', name: 'origin/main 메모', where: '내 컴퓨터 (기록)' },
+    'remote':          { no: '5.', name: '공유 폴더',        where: 'GitHub' }
   };
   const AREA_ORDER = ['work', 'staging', 'local', 'origin-tracking', 'remote'];
 
@@ -25,19 +25,19 @@
     },
     'commit': {
       arrows: ['arrow-commit'], areas: ['area-staging', 'area-local'],
-      desc: 'git commit — 스테이징에 올린 것만 로컬 main에 기록됩니다. GitHub에는 아무것도 가지 않습니다.'
+      desc: 'git commit — 고른 것만 지금 있는 작업본에 버전으로 남습니다. GitHub에는 아무것도 가지 않습니다.'
     },
     'push': {
       arrows: ['arrow-push'], areas: ['area-local', 'area-remote', 'area-origin'],
-      desc: 'git push — 로컬 main의 커밋을 GitHub에 보냅니다. 성공하면 origin/main 기록도 함께 최신이 됩니다.'
+      desc: 'git push — 지금 작업본에 남긴 버전을 공유 폴더로 보냅니다. 성공하면 origin/main 메모도 함께 최신이 됩니다.'
     },
     'fetch': {
       arrows: ['arrow-fetch'], areas: ['area-remote', 'area-origin'],
-      desc: 'git fetch — GitHub의 커밋을 실제로 받아와 origin/main을 갱신합니다. 로컬 main과 작업 폴더는 그대로입니다.'
+      desc: 'git fetch — 공유 폴더의 새 버전을 실제로 받아와 origin/main 메모를 갱신합니다. 내 작업본과 책상은 그대로입니다.'
     },
     'merge': {
       arrows: ['arrow-merge'], areas: ['area-origin', 'area-local', 'area-work'],
-      desc: 'git merge origin/main — 받아둔 origin/main의 내용을 로컬 main과 작업 폴더에 합칩니다.'
+      desc: 'git merge origin/main — origin/main 메모에 받아둔 내용을 지금 있는 작업본과 책상에 합칩니다.'
     },
     'pull': {
       arrows: ['arrow-fetch', 'arrow-merge'], areas: ['area-remote', 'area-origin', 'area-local', 'area-work'],
@@ -56,8 +56,8 @@
       desc: 'git restore --source=HEAD -- <파일> — 마지막 커밋 상태로 작업 폴더를 되돌립니다. 커밋하지 않은 수정은 사라집니다.'
     },
     'switch': {
-      arrows: [], areas: ['area-local', 'area-staging', 'area-work'],
-      desc: 'git switch <브랜치> — 로컬 저장소의 다른 커밋을 기준으로 스테이징과 작업 폴더를 다시 채웁니다.'
+      arrows: ['arrow-switch'], areas: ['area-local', 'area-branch', 'area-staging', 'area-work'],
+      desc: 'git switch <브랜치> — HEAD 표시를 다른 작업본으로 옮깁니다. 그 작업본의 마지막 버전에 맞춰 책상과 고르는 자리도 다시 채워집니다.'
     },
     'none': { arrows: [], areas: [], desc: '' }
   };
@@ -175,7 +175,7 @@
       if (wasActive) { highlightFlow('none'); return; }
       card.classList.add('is-active');
       highlightFlow(flowId);
-      const target = document.getElementById('basics');
+      const target = document.getElementById('home');   // 섹션 개편으로 #basics -> #home
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
