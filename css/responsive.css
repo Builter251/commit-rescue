@@ -49,7 +49,6 @@
   .section--stage { padding: 16px 0 32px; }
   .stage { gap: 10px; }
   .stage__picker { padding: 10px; }
-  .stage__picker-label { font-size: .74rem; }
   .stage__actions .btn { flex: 1 1 100%; }
   .pill { font-size: .76rem; padding: 6px 10px; }
   .pill__ko { font-size: .68rem; }
@@ -65,7 +64,7 @@
   }
   .areas {
     min-width: 560px;                  /* 이 폭 아래로는 라벨이 읽히지 않는다 */
-    max-height: calc(100dvh - var(--nav-h) - 300px);
+    max-height: calc(100dvh - var(--nav-h) - 240px);
     min-height: 280px;
   }
   /* 축소된 만큼 글자를 키워 가독성을 맞춘다 (viewBox 단위) */

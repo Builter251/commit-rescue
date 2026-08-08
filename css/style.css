@@ -181,7 +181,12 @@ code {
   font-weight: 800; font-size: 1.05rem;
   color: var(--fg); text-decoration: none; white-space: nowrap;
 }
-.nav__logo { font-size: 1.2rem; }
+.nav__logo {
+  display: inline-flex; color: var(--accent);
+  /* 이모지(🛟)는 유니코드 14라 구형 Windows에 폰트가 없어 두부로 보인다.
+     인라인 SVG는 어느 환경에서나 같게 그려진다. */
+}
+.nav__logo svg { display: block; }
 
 .nav__menu { display: flex; align-items: center; gap: 8px; }
 .nav__menu ul { display: flex; list-style: none; gap: 2px; }
@@ -257,24 +262,15 @@ code {
 .stage__head { text-align: center; }
 .stage__title {
   font-size: clamp(1.25rem, 2.3vw, 1.7rem);
-  font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px;
+  font-weight: 800; letter-spacing: -.02em; margin: 0;
   line-height: 1.3;
 }
 .stage__title em { font-style: normal; color: var(--accent); }
-.stage__lead {
-  font-size: .9rem; color: var(--fg-muted);
-  max-width: 60ch; margin: 0 auto;
-}
-.stage__lead strong { color: var(--fg); }
 
 /* 알약 버튼 — 그림 위에 둔다 */
 .stage__picker {
   background: var(--bg-alt); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 9px 12px;
-}
-.stage__picker-label {
-  font-size: .75rem; font-weight: 800; letter-spacing: .03em;
-  color: var(--fg-faint); margin: 0 0 6px; text-align: center;
 }
 .stage__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
@@ -343,7 +339,7 @@ code {
 .areas {
   display: block;
   width: 100%; height: auto;
-  max-height: calc(100dvh - var(--nav-h) - 320px);
+  max-height: calc(100dvh - var(--nav-h) - 250px);
   min-height: 300px;
 }
 
